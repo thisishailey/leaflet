@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material';
+import { theme } from '@/styles/theme';
 
 export const metadata: Metadata = {
     title: 'Leaflet',
@@ -15,8 +14,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={inter.className}>{children}</body>
-        </html>
+        <ThemeProvider theme={theme}>
+            <html lang="en">
+                <CssBaseline enableColorScheme />
+                <body>{children}</body>
+            </html>
+        </ThemeProvider>
     );
 }
