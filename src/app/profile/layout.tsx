@@ -1,3 +1,12 @@
-export default function ProfileLayout() {
-    return <div>{'Profile'}</div>;
+export default function ProfileLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <div>
+            {'Profile'}
+            {children}
+        </div>
+    );
 }

@@ -1,3 +1,12 @@
-export default function BookLayout() {
-    return <div>{'Book'}</div>;
+export default function BookLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <div>
+            {'Book'}
+            {children}
+        </div>
+    );
 }

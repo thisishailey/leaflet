@@ -1,3 +1,12 @@
-export default function PostLayout() {
-    return <div>{'Post'}</div>;
+export default function PostLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <div>
+            {'Post'}
+            {children}
+        </div>
+    );
 }
