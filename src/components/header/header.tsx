@@ -2,7 +2,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from '@/assets/icon/icon.png';
+import logo from '@/assets/logo/logo.png';
 
 export default function Header() {
     return (

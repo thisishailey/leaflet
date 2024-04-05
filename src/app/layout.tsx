@@ -10,6 +10,7 @@ import Footer from '@/components/footer/footer';
 export const metadata: Metadata = {
     title: 'Leaflet',
     description: 'A social media platform for book lovers',
+	
 };
 
 export default function RootLayout({
