@@ -6,6 +6,7 @@ import { theme } from '@/styles/theme';
 import { Wrapper } from '@/components/common/wrapper';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
+import favicon from '@/app/favicon/favicon.ico';
 
 export const metadata: Metadata = {
     title: 'Leaflet',
@@ -22,6 +23,13 @@ export default function RootLayout({
             <CssVarsProvider theme={theme}>
                 <CssBaseline />
                 <html lang="en">
+                    <head>
+                        <link
+                            rel="icon"
+                            href={favicon.src}
+                            type="image/x-icon"
+                        />
+                    </head>
                     <body>
                         <Header />
                         <Wrapper>{children}</Wrapper>
