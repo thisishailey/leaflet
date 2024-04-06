@@ -11,7 +11,7 @@ export default function ProfileLayout({
     wishlist: React.ReactNode;
     bookmark: React.ReactNode;
 }>) {
-    const currentTab: string = 'post';
+    const currentTab: string = 'none';
 
     return (
         <div>
