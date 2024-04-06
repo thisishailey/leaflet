@@ -13,6 +13,8 @@ import logo from '@/assets/logo/logo.png';
 import logoWhite from '@/assets/logo/logo-white.png';
 import logoBlack from '@/assets/logo/logo-black.png';
 
+type TabGroup = 'social' | 'user';
+
 const socialTabs = [
     { name: '리프', link: '/' },
     { name: '도서', link: '/book' },
@@ -23,12 +25,11 @@ const userTabs = [
     { name: '메세지', link: '/profile/message' },
     { name: '팔로잉', link: '/profile/following' },
 ];
-type TabGroups = 'social' | 'user';
 
 export const HEADER_HEIGHT = '64px';
 
 export default function Header() {
-    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroups>('social');
+    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social');
     const { mode } = useColorScheme();
 
     return (
@@ -128,7 +129,19 @@ export default function Header() {
                         setCurrentTabGroup('user');
                     }}
                 >
-                    <Avatar />
+                    <Avatar
+                        sx={
+                            currentTabGroup === 'social'
+                                ? {
+                                      bgcolor: 'primary.light',
+                                      color: 'secondary.main',
+                                  }
+                                : {
+                                      bgcolor: 'primary.dark',
+                                      color: 'secondary.main',
+                                  }
+                        }
+                    />
                 </Link>
             </Toolbar>
         </AppBar>
