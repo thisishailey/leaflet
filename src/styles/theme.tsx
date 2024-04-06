@@ -5,7 +5,12 @@ import {
     experimental_extendTheme as extendTheme,
     useColorScheme,
 } from '@mui/material/styles';
-import Button from '@mui/material/Button';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import Typography from '@mui/material/Typography';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
+import NightlightIcon from '@mui/icons-material/Nightlight';
 import { noto_sans } from '@/styles/font';
 
 const COLOR = {
@@ -55,9 +60,17 @@ export const theme = extendTheme({
     },
 });
 
+type Mode = 'light' | 'system' | 'dark';
+
+const modeButton = [
+    { value: 'light', icon: <LightModeIcon />, name: '라이트 모드' },
+    { value: 'system', icon: <SettingsBrightnessIcon />, name: '시스템 설정' },
+    { value: 'dark', icon: <NightlightIcon />, name: '다크 모드' },
+];
+
 export const ModeSwicher = () => {
-    const { mode, setMode } = useColorScheme();
     const [mounted, setMounted] = useState(false);
+    const { mode, setMode } = useColorScheme();
 
     useEffect(() => {
         setMounted(true);
@@ -67,13 +80,39 @@ export const ModeSwicher = () => {
         return null;
     }
 
+    const handleModeChange = (
+        _event: React.MouseEvent<HTMLElement>,
+        newMode: Mode
+    ) => {
+        setMode(newMode);
+    };
+
     return (
-        <Button
-            onClick={() => {
-                setMode(mode === 'light' ? 'dark' : 'light');
-            }}
+        <ToggleButtonGroup
+            exclusive
+            color="primary"
+            value={mode}
+            onChange={handleModeChange}
+            aria-label="Mode"
         >
-            {mode}
-        </Button>
+            {modeButton.map((mode) => {
+                return (
+                    <ToggleButton
+                        key={mode.value}
+                        value={mode.value}
+                        sx={{ display: 'flex', flexDirection: 'column' }}
+                    >
+                        {mode.icon}
+                        <Typography
+                            fontSize={'14px'}
+                            fontWeight={500}
+                            mt={'8px'}
+                        >
+                            {mode.name}
+                        </Typography>
+                    </ToggleButton>
+                );
+            })}
+        </ToggleButtonGroup>
     );
 };
