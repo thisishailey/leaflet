@@ -17,13 +17,7 @@ export default function Footer() {
     ];
 
     return (
-        <Box
-            component={'footer'}
-            sx={{
-                width: '100%',
-                marginTop: '82px',
-            }}
-        >
+        <Box component={'footer'}>
             <Divider aria-hidden="true" variant="middle" />
             <Container
                 maxWidth="lg"

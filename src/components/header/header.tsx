@@ -25,6 +25,8 @@ const userTabs = [
 ];
 type TabGroups = 'social' | 'user';
 
+export const HEADER_HEIGHT = '64px';
+
 export default function Header() {
     const [currentTabGroup, setCurrentTabGroup] = useState<TabGroups>('social');
     const { mode } = useColorScheme();
