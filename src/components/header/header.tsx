@@ -3,12 +3,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useColorScheme } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import logo from '@/assets/logo/logo.png';
+import logoWhite from '@/assets/logo/logo-white.png';
+import logoBlack from '@/assets/logo/logo-black.png';
 
 const socialTabs = [
     { name: '리프', link: '/' },
@@ -24,33 +27,41 @@ type TabGroups = 'social' | 'user';
 
 export default function Header() {
     const [currentTabGroup, setCurrentTabGroup] = useState<TabGroups>('social');
+    const { mode } = useColorScheme();
 
     return (
         <AppBar
-            color="default"
+            enableColorOnDark
+            color={currentTabGroup === 'social' ? 'default' : 'primary'}
             position="fixed"
-            sx={{ backgroundImage: 'var(--mui-overlays-2)' }}
+            sx={{ backgroundImage: 'var(--mui-overlays-2)', boxShadow: 3 }}
         >
             <Toolbar
                 sx={{
                     width: '100%',
                     maxWidth: '1024px',
                     margin: '0 auto',
-                    padding: '1rem',
+                    padding: '0.5rem',
                 }}
             >
                 <Link
                     href={'/'}
-                    style={{ height: '50px' }}
+                    style={{ height: '40px' }}
                     onClick={() => {
                         setCurrentTabGroup('social');
                     }}
                 >
                     <Image
-                        src={logo.src}
+                        src={
+                            currentTabGroup === 'social'
+                                ? logo.src
+                                : mode === 'light'
+                                ? logoWhite.src
+                                : logoBlack.src
+                        }
                         alt="Leaflet"
-                        width={'50'}
-                        height={'50'}
+                        width={'40'}
+                        height={'40'}
                         priority
                     />
                 </Link>
@@ -58,16 +69,10 @@ export default function Header() {
                     <Container
                         sx={{
                             display: 'flex',
-                            gap: { xs: '0', md: '6rem' },
+                            gap: { xs: '0', md: '8rem' },
                             justifyContent: {
                                 xs: 'space-around',
                                 md: 'center',
-                            },
-                            marginRight: {
-                                xs: '0',
-                                sm: '50px',
-                                md: '100px',
-                                lg: '150px',
                             },
                         }}
                     >
@@ -91,16 +96,10 @@ export default function Header() {
                     <Container
                         sx={{
                             display: 'flex',
-                            gap: { xs: '0', md: '6rem' },
+                            gap: { xs: '0', md: '8rem' },
                             justifyContent: {
                                 xs: 'space-around',
                                 md: 'center',
-                            },
-                            marginLeft: {
-                                xs: '0',
-                                sm: '50px',
-                                md: '100px',
-                                lg: '150px',
                             },
                         }}
                     >
