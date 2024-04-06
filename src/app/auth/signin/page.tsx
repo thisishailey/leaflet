@@ -1,11 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { CopyrightShort } from '@/components/common/copyright';
@@ -34,13 +34,13 @@ export default function SignIn() {
                     alignItems: 'center',
                 }}
             >
-                <Typography component="h1" fontSize={'28px'} fontWeight={500}>
+                <Typography component="h3" fontSize={'28px'} fontWeight={500}>
                     {'로그인'}
                 </Typography>
                 <Box
+                    noValidate
                     component="form"
                     onSubmit={handleSubmit}
-                    noValidate
                     sx={{ mt: 4 }}
                 >
                     <TextField
@@ -60,8 +60,8 @@ export default function SignIn() {
                         id="password"
                         name="password"
                         label="비밀번호"
-                        type="password"
                         autoComplete="current-password"
+                        type="password"
                     />
                     <Box
                         display={'flex'}
@@ -71,7 +71,8 @@ export default function SignIn() {
                         <FormControlLabel
                             control={
                                 <Checkbox
-                                    value="auto-login"
+                                    id="autoLogin"
+                                    value="autoLogin"
                                     color="primary"
                                     size="small"
                                 />
@@ -79,13 +80,15 @@ export default function SignIn() {
                             label="자동 로그인"
                             slotProps={{ typography: { fontSize: '14px' } }}
                         />
-                        <Link href="#" variant="body2">
-                            {'비밀번호 찾기'}
+                        <Link href="#">
+                            <Typography fontSize={'14px'}>
+                                {'비밀번호 찾기'}
+                            </Typography>
                         </Link>
                     </Box>
                     <Button
-                        type="submit"
                         fullWidth
+                        type="submit"
                         variant="contained"
                         sx={{
                             mt: 5,
@@ -97,8 +100,8 @@ export default function SignIn() {
                         {'로그인'}
                     </Button>
                     <Button
-                        onClick={() => replace('/auth/signup')}
                         fullWidth
+                        onClick={() => replace('/auth/signup')}
                         variant="outlined"
                         sx={{
                             mt: 2,
