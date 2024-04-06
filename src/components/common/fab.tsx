@@ -29,63 +29,69 @@ export default function BottomActionButtons() {
     };
 
     return (
-        <Box
-            sx={{
-                position: 'fixed',
-                bottom: 30,
-                right: 30,
-                display: 'flex',
-                gap: '10px',
-            }}
-        >
-            <Fab
-                aria-label="scroll back to top"
-                onClick={handleBackToTop}
-                color="secondary"
-                size="small"
+        <div id="bottom-action-buttons">
+            <Box
                 sx={{
-                    border: 1,
-                    borderColor: 'grey.500',
+                    position: 'fixed',
+                    bottom: 30,
+                    right: 30,
+                    display: 'flex',
+                    gap: '10px',
                 }}
             >
-                <VerticalAlignTopRoundedIcon />
-            </Fab>
-            <Fab
-                aria-label="website settings"
-                onClick={handleOpenSetting}
-                color="secondary"
-                size="small"
-                sx={{
-                    border: 1,
-                    borderColor: 'grey.500',
-                }}
-            >
-                <SettingsIcon />
-            </Fab>
-            <Popover
-                id={anchorEl ? 'website-setting-popover' : undefined}
-                open={Boolean(anchorEl)}
-                anchorEl={anchorEl}
-                onClose={handleCloseSetting}
-                anchorOrigin={{
-                    vertical: -15,
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                elevation={5}
-                slotProps={{ paper: { sx: { borderRadius: '8px' } } }}
-                disableScrollLock
-            >
-                <Container sx={{ padding: '1.2rem' }}>
-                    <Typography component={'h4'} fontWeight={600} mb={'10px'}>
-                        {'화면 스타일'}
-                    </Typography>
-                    <ModeSwicher />
-                </Container>
-            </Popover>
-        </Box>
+                <Fab
+                    aria-label="scroll back to top"
+                    onClick={handleBackToTop}
+                    color="secondary"
+                    size="small"
+                    sx={{
+                        border: 1,
+                        borderColor: 'grey.500',
+                    }}
+                >
+                    <VerticalAlignTopRoundedIcon />
+                </Fab>
+                <Fab
+                    aria-label="website settings"
+                    onClick={handleOpenSetting}
+                    color="secondary"
+                    size="small"
+                    sx={{
+                        border: 1,
+                        borderColor: 'grey.500',
+                    }}
+                >
+                    <SettingsIcon />
+                </Fab>
+                <Popover
+                    id={anchorEl ? 'website-setting-popover' : undefined}
+                    open={Boolean(anchorEl)}
+                    anchorEl={anchorEl}
+                    onClose={handleCloseSetting}
+                    anchorOrigin={{
+                        vertical: -15,
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    elevation={5}
+                    slotProps={{ paper: { sx: { borderRadius: '8px' } } }}
+                    disableScrollLock
+                >
+                    <Container sx={{ padding: '1.2rem' }}>
+                        <Typography
+                            component={'h4'}
+                            fontWeight={600}
+                            mb={'10px'}
+                        >
+                            {'화면 스타일'}
+                        </Typography>
+                        <ModeSwicher />
+                    </Container>
+                </Popover>
+            </Box>
+        </div>
     );
 }

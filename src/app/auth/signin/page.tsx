@@ -1,9 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
@@ -12,6 +17,7 @@ import { CopyrightShort } from '@/components/common/copyright';
 
 export default function SignIn() {
     const { replace } = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -22,12 +28,18 @@ export default function SignIn() {
         });
     };
 
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <>
-            <style>{'body {height: 100vh; overflow: hidden;}'}</style>
+            <style>
+                {`main {min-height: 0 !important;} footer {display: none;} #bottom-action-buttons {display: none;}`}
+            </style>
             <Box
                 sx={{
-                    marginTop: 8,
+                    mt: { xs: 2, md: 8 },
                     padding: 2,
                     display: 'flex',
                     flexDirection: 'column',
@@ -41,7 +53,7 @@ export default function SignIn() {
                     noValidate
                     component="form"
                     onSubmit={handleSubmit}
-                    sx={{ mt: 4 }}
+                    sx={{ mt: { xs: 2, md: 4 }, maxWidth: '397px' }}
                 >
                     <TextField
                         required
@@ -56,12 +68,27 @@ export default function SignIn() {
                     <TextField
                         required
                         fullWidth
-                        margin="normal"
                         id="password"
                         name="password"
                         label="비밀번호"
-                        autoComplete="current-password"
-                        type="password"
+                        autoComplete="new-password"
+                        type={showPassword ? 'text' : 'password'}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleTogglePasswordVisibility}
+                                    >
+                                        {showPassword ? (
+                                            <Visibility />
+                                        ) : (
+                                            <VisibilityOff />
+                                        )}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <Box
                         display={'flex'}
@@ -91,7 +118,7 @@ export default function SignIn() {
                         type="submit"
                         variant="contained"
                         sx={{
-                            mt: 5,
+                            mt: 4,
                             padding: '10px',
                             fontSize: '16px',
                             fontWeight: 500,
@@ -114,7 +141,7 @@ export default function SignIn() {
                     </Button>
                 </Box>
             </Box>
-            <CopyrightShort sx={{ mt: 8, mb: 4 }} />
+            <CopyrightShort sx={{ mt: { xs: 4, md: 6 }, mb: 4 }} />
         </>
     );
 }

@@ -1,9 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
@@ -13,6 +17,7 @@ import { CopyrightShort } from '@/components/common/copyright';
 
 export default function SignUp() {
     const { replace } = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -23,12 +28,18 @@ export default function SignUp() {
         });
     };
 
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <>
-            <style>{'body {height: 100vh; overflow: hidden;}'}</style>
+            <style>
+                {`main {min-height: 0 !important;} footer {display: none;} #bottom-action-buttons {display: none;}`}
+            </style>
             <Box
                 sx={{
-                    marginTop: 8,
+                    mt: { xs: 0, sm: 2, md: 8 },
                     padding: 2,
                     display: 'flex',
                     flexDirection: 'column',
@@ -42,9 +53,9 @@ export default function SignUp() {
                     noValidate
                     component="form"
                     onSubmit={handleSubmit}
-                    sx={{ mt: 4 }}
+                    sx={{ mt: { xs: 2, md: 4 }, maxWidth: '397px' }}
                 >
-                    <Grid container spacing={2} sx={{ width: '397px' }}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 required
@@ -84,30 +95,46 @@ export default function SignUp() {
                                 name="password"
                                 label="비밀번호"
                                 autoComplete="new-password"
-                                type="password"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        id="receiveEmail"
-                                        value="receiveEmail"
-                                        color="primary"
-                                        size="small"
-                                    />
-                                }
-                                label="이메일 수신 동의"
-                                slotProps={{ typography: { fontSize: '14px' } }}
+                                type={showPassword ? 'text' : 'password'}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={
+                                                    handleTogglePasswordVisibility
+                                                }
+                                            >
+                                                {showPassword ? (
+                                                    <Visibility />
+                                                ) : (
+                                                    <VisibilityOff />
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
                     </Grid>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                id="receiveEmail"
+                                value="receiveEmail"
+                                color="primary"
+                                size="small"
+                            />
+                        }
+                        label="이메일 수신 동의"
+                        slotProps={{ typography: { fontSize: '14px' } }}
+                    />
                     <Button
                         fullWidth
                         type="submit"
                         variant="contained"
                         sx={{
-                            mt: 5,
+                            mt: 4,
                             padding: '10px',
                             fontSize: '16px',
                             fontWeight: 500,
@@ -130,7 +157,7 @@ export default function SignUp() {
                     </Button>
                 </Box>
             </Box>
-            <CopyrightShort sx={{ mt: 8, mb: 4 }} />
+            <CopyrightShort sx={{ mt: { xs: 4, md: 6 }, mb: 4 }} />
         </>
     );
 }

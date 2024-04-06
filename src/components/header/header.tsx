@@ -42,6 +42,7 @@ export default function Header() {
                 sx={{
                     width: '100%',
                     maxWidth: '1024px',
+                    height: HEADER_HEIGHT,
                     margin: '0 auto',
                     padding: '0.5rem',
                 }}
