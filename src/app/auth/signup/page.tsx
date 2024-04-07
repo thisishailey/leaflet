@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import authSignUp from '@/firebase/auth/signup';
-import { AuthSignUpProps } from '@/firebase/auth/signup';
+import type { AuthSignUpProps } from '@/firebase/auth/signup';
+import addData from '@/firebase/db/addData';
+import type { AddUserDataProps } from '@/firebase/db/model';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -21,26 +23,49 @@ export default function SignUp() {
     const { replace } = useRouter();
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const data = new FormData(event.currentTarget);
         const email = data.get('email') as string;
         const password = data.get('password') as string;
         const firstName = data.get('firstName') as string;
+        const lastName = data.get('lastName') as string;
 
-        handleSignUp({ email, password, firstName });
+        const success = await handleAuth({ email, password, firstName });
+        if (!success) {
+            console.log('sign up failed');
+            return;
+        }
+
+        const complete = await handleDb({ email, firstName, lastName });
+        if (complete) {
+            replace('/profile');
+        }
     };
 
-    const handleSignUp = async (props: AuthSignUpProps) => {
+    const handleAuth = async (props: AuthSignUpProps) => {
         const { result, error } = await authSignUp(props);
 
         if (error) {
             console.log(error);
+            return false;
         }
 
         console.log(result);
-        replace('/profile');
+        return true;
+    };
+
+    const handleDb = async (props: AddUserDataProps) => {
+        const { result, error } = await addData('user', props.email, props);
+
+        if (error) {
+            console.log(error);
+            return false;
+        }
+
+        console.log(result);
+        return true;
     };
 
     const handleTogglePasswordVisibility = () => {
