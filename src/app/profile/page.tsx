@@ -1,12 +1,9 @@
-import Link from 'next/link';
-import Button from '@mui/material/Button';
+import AuthButtons from '@/firebase/auth/components/authButtons';
 
 export default function Profile() {
     return (
         <div>
-            <Link href="/auth/signin">
-                <Button>Sign In</Button>
-            </Link>
+            <AuthButtons />
         </div>
     );
 }

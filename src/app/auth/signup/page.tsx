@@ -20,20 +20,25 @@ export default function SignUp() {
     const { replace } = useRouter();
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
         const email = data.get('email') as string;
         const password = data.get('password') as string;
 
+        handleSignUp(email, password);
+    };
+
+    const handleSignUp = async (email: string, password: string) => {
         const { result, error } = await authSignUp(email, password);
 
         if (error) {
-            return console.log(error);
+            console.log(error);
         }
 
         console.log(result);
-        return replace('/profile');
+        replace('/profile');
     };
 
     const handleTogglePasswordVisibility = () => {
