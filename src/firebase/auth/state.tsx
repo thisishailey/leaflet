@@ -1,10 +1,9 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { firebaseApp } from '../config';
-import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
+import { firebaseAuth } from '../config';
+import { User, onAuthStateChanged } from 'firebase/auth';
 
-const auth = getAuth(firebaseApp);
 const AuthContext = createContext<{ user: User | null }>({ user: null });
 export const useAuthContext = () => useContext(AuthContext);
 
@@ -17,7 +16,7 @@ export default function AuthContextProvider({
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
             setUser(user);
             setLoading(false);
         });

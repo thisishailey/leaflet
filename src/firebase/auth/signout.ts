@@ -1,13 +1,12 @@
-import { firebaseApp } from '../config';
-import { getAuth, signOut } from 'firebase/auth';
+import { firebaseAuth } from '../config';
+import { signOut } from 'firebase/auth';
 
 export default async function authSignOut() {
-    const auth = getAuth(firebaseApp);
     let result: string | null = null,
         error = null;
 
     try {
-        await signOut(auth);
+        await signOut(firebaseAuth);
     } catch (e) {
         error = e;
     }

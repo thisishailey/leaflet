@@ -1,14 +1,29 @@
-import { firebaseApp } from '../config';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { firebaseAuth } from '../config';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import type { UserCredential } from 'firebase/auth';
 
-export default async function authSignUp(email: string, password: string) {
-    const auth = getAuth(firebaseApp);
+export interface AuthSignUpProps {
+    email: string;
+    password: string;
+    firstName: string;
+}
+
+export default async function authSignUp({
+    email,
+    password,
+    firstName,
+}: AuthSignUpProps) {
     let result: UserCredential | null = null,
         error = null;
 
     try {
-        result = await createUserWithEmailAndPassword(auth, email, password);
+        result = await createUserWithEmailAndPassword(
+            firebaseAuth,
+            email,
+            password
+        );
+        const currentUser = result.user;
+        await updateProfile(currentUser, { displayName: firstName });
     } catch (e) {
         error = e;
     }

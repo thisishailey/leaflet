@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import authSignUp from '@/firebase/auth/signup';
+import { AuthSignUpProps } from '@/firebase/auth/signup';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -26,12 +27,13 @@ export default function SignUp() {
         const data = new FormData(event.currentTarget);
         const email = data.get('email') as string;
         const password = data.get('password') as string;
+        const firstName = data.get('firstName') as string;
 
-        handleSignUp(email, password);
+        handleSignUp({ email, password, firstName });
     };
 
-    const handleSignUp = async (email: string, password: string) => {
-        const { result, error } = await authSignUp(email, password);
+    const handleSignUp = async (props: AuthSignUpProps) => {
+        const { result, error } = await authSignUp(props);
 
         if (error) {
             console.log(error);
@@ -73,10 +75,10 @@ export default function SignUp() {
                             <TextField
                                 required
                                 fullWidth
-                                id="firstName"
-                                name="firstName"
+                                id="lastName"
+                                name="lastName"
                                 label="성"
-                                autoComplete="given-name"
+                                autoComplete="family-name"
                                 autoFocus
                             />
                         </Grid>
@@ -84,10 +86,10 @@ export default function SignUp() {
                             <TextField
                                 required
                                 fullWidth
-                                id="lastName"
-                                name="lastName"
+                                id="firstName"
+                                name="firstName"
                                 label="이름"
-                                autoComplete="family-name"
+                                autoComplete="given-name"
                             />
                         </Grid>
                         <Grid item xs={12}>
