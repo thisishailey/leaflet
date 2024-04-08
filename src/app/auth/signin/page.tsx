@@ -38,7 +38,7 @@ export default function SignIn() {
         }
 
         console.log(result);
-        replace('/profile');
+        replace('/user/following');
     };
 
     const handleTogglePasswordVisibility = () => {

@@ -40,7 +40,7 @@ export default function SignUp() {
 
         const complete = await handleDb({ email, firstName, lastName });
         if (complete) {
-            replace('/profile');
+            replace('/user');
         }
     };
 

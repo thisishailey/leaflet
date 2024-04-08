@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useAuthContext } from '@/firebase/auth/state';
 import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
@@ -15,24 +16,48 @@ import logoWhite from '@/assets/logo/logo-white.png';
 import logoBlack from '@/assets/logo/logo-black.png';
 
 type TabGroup = 'social' | 'user';
+type Tab = '리프' | '도서' | '서점' | '알림' | '메세지' | '팔로잉';
 
-const socialTabs = [
+const tabs: { name: Tab; link: string }[] = [
     { name: '리프', link: '/' },
     { name: '도서', link: '/book' },
     { name: '서점', link: '/bookstore' },
-];
-const userTabs = [
     { name: '알림', link: '/user/notification' },
     { name: '메세지', link: '/user/message' },
     { name: '팔로잉', link: '/user/following' },
 ];
+const socialTabs = tabs.slice(0, 3);
+const userTabs = tabs.slice(3);
 
 export const HEADER_HEIGHT = '64px';
 
 export default function Header() {
-    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social'); // FIXME need to determine currentTabGroup based on a path ('/user' path => 'user', else => 'social')
+    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social');
+    const [currentTab, setCurrentTab] = useState<Tab>();
     const { user } = useAuthContext();
     const { mode } = useColorScheme();
+
+    const pathname = usePathname();
+    useEffect(() => {
+        if (pathname.startsWith('/user')) {
+            if (currentTabGroup !== 'user') {
+                setCurrentTabGroup('user');
+            }
+        } else {
+            if (currentTabGroup !== 'social') {
+                setCurrentTabGroup('social');
+            }
+        }
+
+        const tab = tabs.findLast((tab) => pathname.startsWith(tab.link));
+        if (tab) {
+            if (currentTab !== tab.name) {
+                setCurrentTab(tab.name);
+            }
+        } else {
+            setCurrentTab(undefined);
+        }
+    }, [pathname, currentTabGroup, currentTab]);
 
     return (
         <AppBar
@@ -71,60 +96,58 @@ export default function Header() {
                         priority
                     />
                 </Link>
-                {currentTabGroup === 'social' && (
-                    <Container
-                        sx={{
-                            display: 'flex',
-                            gap: { xs: '0', md: '8rem' },
-                            justifyContent: {
-                                xs: 'space-around',
-                                md: 'center',
-                            },
-                        }}
-                    >
-                        {socialTabs.map((tab) => {
+                <Container
+                    sx={{
+                        display: 'flex',
+                        gap: { xs: '0', md: '8rem' },
+                        justifyContent: {
+                            xs: 'space-around',
+                            md: 'center',
+                        },
+                    }}
+                >
+                    {currentTabGroup === 'social' &&
+                        socialTabs.map((tab) => {
                             return (
                                 <Link href={tab.link} key={tab.name}>
                                     <Box
                                         component={'h2'}
-                                        fontSize={'20px'}
-                                        fontWeight={500}
                                         margin={0}
+                                        fontSize={'20px'}
+                                        fontWeight={
+                                            currentTab === tab.name ? 600 : 400
+                                        }
+                                        color={
+                                            currentTab !== tab.name
+                                                ? 'inherit'
+                                                : mode === 'light'
+                                                ? 'primary.main'
+                                                : 'primary.light'
+                                        }
                                     >
                                         {tab.name}
                                     </Box>
                                 </Link>
                             );
                         })}
-                    </Container>
-                )}
-                {currentTabGroup === 'user' && (
-                    <Container
-                        sx={{
-                            display: 'flex',
-                            gap: { xs: '0', md: '8rem' },
-                            justifyContent: {
-                                xs: 'space-around',
-                                md: 'center',
-                            },
-                        }}
-                    >
-                        {userTabs.map((tab) => {
+                    {currentTabGroup === 'user' &&
+                        userTabs.map((tab) => {
                             return (
                                 <Link href={tab.link} key={tab.name}>
                                     <Box
                                         component={'h2'}
-                                        fontSize={'20px'}
-                                        fontWeight={500}
                                         margin={0}
+                                        fontSize={'20px'}
+                                        fontWeight={
+                                            currentTab === tab.name ? 600 : 400
+                                        }
                                     >
                                         {tab.name}
                                     </Box>
                                 </Link>
                             );
                         })}
-                    </Container>
-                )}
+                </Container>
                 <Link
                     href={
                         user === null
