@@ -1,4 +1,4 @@
-export default function UserLayout({
+export default function AccountLayout({
     children,
     post,
     review,
@@ -13,7 +13,7 @@ export default function UserLayout({
 
     return (
         <div>
-            {'User'}
+            {'Account'}
             {children}
             {currentTab === 'post' && post}
             {currentTab === 'review' && review}

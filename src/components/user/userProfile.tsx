@@ -36,16 +36,18 @@ export default function UserProfile({ id }: { id: string }) {
         <Container>
             {data && (
                 <>
-                    <Box>
-                        <Typography>{'이메일'}</Typography>
+                    <Box display={'flex'} gap={'2rem'}>
+                        <Typography fontWeight={500}>{'이메일'}</Typography>
                         <Typography>{data.email}</Typography>
                     </Box>
-                    <Box>
-                        <Typography>{'이름'}</Typography>
+                    <Box display={'flex'} gap={'2rem'}>
+                        <Typography fontWeight={500}>{'이름'}</Typography>
                         <Typography>{data.firstName}</Typography>
                     </Box>
-                    <Box>
-                        <Typography>{'프로필 이름'}</Typography>
+                    <Box display={'flex'} gap={'2rem'}>
+                        <Typography fontWeight={500}>
+                            {'프로필 이름'}
+                        </Typography>
                         <Typography>
                             {data.profileName
                                 ? data.profileName

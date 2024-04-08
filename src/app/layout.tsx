@@ -7,7 +7,7 @@ import AuthContextProvider from '@/firebase/auth/state';
 import Wrapper from '@/components/common/wrapper';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
-import favicon from '@/app/favicon/favicon.ico';
+import favicon from '@/assets/favicon/favicon.ico';
 
 export const metadata: Metadata = {
     title: 'Leaflet',

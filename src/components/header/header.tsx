@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useColorScheme } from '@mui/material';
+import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
@@ -21,9 +21,9 @@ const socialTabs = [
     { name: '서점', link: '/bookstore' },
 ];
 const userTabs = [
-    { name: '알림', link: '/profile/notification' },
-    { name: '메세지', link: '/profile/message' },
-    { name: '팔로잉', link: '/profile/following' },
+    { name: '알림', link: '/user/notification' },
+    { name: '메세지', link: '/user/message' },
+    { name: '팔로잉', link: '/user/following' },
 ];
 
 export const HEADER_HEIGHT = '64px';
@@ -124,7 +124,11 @@ export default function Header() {
                     </Container>
                 )}
                 <Link
-                    href={'/profile'}
+                    href={
+                        currentTabGroup === 'social'
+                            ? '/user/following'
+                            : '/user'
+                    }
                     onClick={() => {
                         setCurrentTabGroup('user');
                     }}

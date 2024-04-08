@@ -1,4 +1,4 @@
-export default function ProfileLayout({
+export default function UserLayout({
     children,
     post,
     review,
@@ -15,7 +15,7 @@ export default function ProfileLayout({
 
     return (
         <div>
-            {'Profile'}
+            {'User'}
             {children}
             {currentTab === 'post' && post}
             {currentTab === 'review' && review}
