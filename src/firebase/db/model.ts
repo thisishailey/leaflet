@@ -26,5 +26,7 @@ export interface AddUserDataProps {
 export const COLLECTION_USER: UserCollection = 'user';
 
 // post
+// TODO make post data model
 
 // review
+// TODO make review data model

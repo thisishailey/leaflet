@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-import { ModeSwicher } from '@/styles/theme';
+import { ModeSwitcher } from '@/styles/theme';
 import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
 import SettingsIcon from '@mui/icons-material/Settings';
 
@@ -88,7 +88,7 @@ export default function BottomActionButtons() {
                         >
                             {'화면 스타일'}
                         </Typography>
-                        <ModeSwicher />
+                        <ModeSwitcher />
                     </Container>
                 </Popover>
             </Box>

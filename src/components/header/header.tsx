@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuthContext } from '@/firebase/auth/state';
 import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -29,7 +30,8 @@ const userTabs = [
 export const HEADER_HEIGHT = '64px';
 
 export default function Header() {
-    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social');
+    const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social'); // FIXME need to determine currentTabGroup based on a path ('/user' path => 'user', else => 'social')
+    const { user } = useAuthContext();
     const { mode } = useColorScheme();
 
     return (
@@ -125,12 +127,14 @@ export default function Header() {
                 )}
                 <Link
                     href={
-                        currentTabGroup === 'social'
+                        user === null
+                            ? '/auth/signin'
+                            : currentTabGroup === 'social'
                             ? '/user/following'
                             : '/user'
                     }
                     onClick={() => {
-                        setCurrentTabGroup('user');
+                        user && setCurrentTabGroup('user');
                     }}
                 >
                     <Avatar

@@ -68,7 +68,7 @@ const modeButton = [
     { value: 'dark', icon: <NightlightIcon />, name: '다크 모드' },
 ];
 
-export const ModeSwicher = () => {
+export const ModeSwitcher = () => {
     const [mounted, setMounted] = useState(false);
     const { mode, setMode } = useColorScheme();
 

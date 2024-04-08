@@ -11,3 +11,14 @@ export const CopyrightShort = (props: any) => {
         </Typography>
     );
 };
+
+export const Copyright = (props: any) => {
+    return (
+        <Typography {...props}>
+            {'© '}
+            {new Date().getFullYear()}
+            <Link href="/">{' Leaflet'}</Link>
+            {'. All rights reserved.'}
+        </Typography>
+    );
+};

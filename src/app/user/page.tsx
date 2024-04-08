@@ -6,7 +6,6 @@ import UserProfile from '@/components/user/userProfile';
 
 export default function Profile() {
     const { user } = useAuthContext();
-    console.log(user?.email);
 
     return (
         <div>
