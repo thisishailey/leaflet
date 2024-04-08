@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import { Copyright } from '../common/copyright';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -42,12 +43,7 @@ export default function Footer() {
                     padding: '40px',
                 }}
             >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        gap: '1.6rem',
-                    }}
-                >
+                <Stack direction="row" spacing={2}>
                     {sms.map((media) => {
                         return (
                             <Link
@@ -59,7 +55,7 @@ export default function Footer() {
                             </Link>
                         );
                     })}
-                </Box>
+                </Stack>
                 <Copyright fontSize={'14px'} />
             </Container>
         </Box>

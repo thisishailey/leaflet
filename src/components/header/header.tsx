@@ -8,7 +8,7 @@ import { useAuthContext } from '@/firebase/auth/state';
 import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import logo from '@/assets/logo/logo.png';
@@ -96,15 +96,11 @@ export default function Header() {
                         priority
                     />
                 </Link>
-                <Container
-                    sx={{
-                        display: 'flex',
-                        gap: { xs: '0', md: '8rem' },
-                        justifyContent: {
-                            xs: 'space-around',
-                            md: 'center',
-                        },
-                    }}
+                <Stack
+                    direction="row"
+                    width={'100%'}
+                    spacing={{ xs: 0, md: 20 }}
+                    justifyContent={{ xs: 'space-around', md: 'center' }}
                 >
                     {currentTabGroup === 'social' &&
                         socialTabs.map((tab) => {
@@ -147,7 +143,7 @@ export default function Header() {
                                 </Link>
                             );
                         })}
-                </Container>
+                </Stack>
                 <Link
                     href={
                         user === null
