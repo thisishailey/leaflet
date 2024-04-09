@@ -34,11 +34,11 @@ export default function SignIn() {
         const { result, error } = await authSignIn(email, password);
 
         if (error) {
-            console.log(error);
+            return console.log(error);
         }
 
         console.log(result);
-        replace('/user/following');
+        return replace('/user/following');
     };
 
     const handleTogglePasswordVisibility = () => {
@@ -63,7 +63,6 @@ export default function SignIn() {
                     {'로그인'}
                 </Typography>
                 <Box
-                    noValidate
                     component="form"
                     onSubmit={handleSubmit}
                     sx={{ mt: { xs: 2, md: 4 }, maxWidth: '397px' }}
@@ -74,6 +73,7 @@ export default function SignIn() {
                         margin="normal"
                         id="email"
                         name="email"
+                        type="email"
                         label="이메일"
                         autoComplete="email"
                         autoFocus
@@ -83,9 +83,9 @@ export default function SignIn() {
                         fullWidth
                         id="password"
                         name="password"
+                        type={showPassword ? 'text' : 'password'}
                         label="비밀번호"
                         autoComplete="new-password"
-                        type={showPassword ? 'text' : 'password'}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">

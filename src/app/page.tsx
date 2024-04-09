@@ -1,7 +1,10 @@
+import Container from '@mui/material/Container';
+import { SearchPost } from '@/components/common/searchbar';
+
 export default function Home() {
     return (
-        <>
-            <div>{'Home'}</div>
-        </>
+        <Container sx={{ textAlign: 'center' }}>
+            <SearchPost />
+        </Container>
     );
 }

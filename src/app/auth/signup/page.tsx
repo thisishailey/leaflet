@@ -34,13 +34,12 @@ export default function SignUp() {
 
         const success = await handleAuth({ email, password, firstName });
         if (!success) {
-            console.log('sign up failed');
-            return;
+            return console.log('sign up failed');
         }
 
         const complete = await handleDb({ email, firstName, lastName });
         if (complete) {
-            replace('/user');
+            return replace('/user');
         }
     };
 
@@ -90,7 +89,6 @@ export default function SignUp() {
                     {'회원가입'}
                 </Typography>
                 <Box
-                    noValidate
                     component="form"
                     onSubmit={handleSubmit}
                     sx={{ mt: { xs: 2, md: 4 }, maxWidth: '397px' }}
@@ -102,6 +100,7 @@ export default function SignUp() {
                                 fullWidth
                                 id="lastName"
                                 name="lastName"
+                                type="string"
                                 label="성"
                                 autoComplete="family-name"
                                 autoFocus
@@ -113,6 +112,7 @@ export default function SignUp() {
                                 fullWidth
                                 id="firstName"
                                 name="firstName"
+                                type="string"
                                 label="이름"
                                 autoComplete="given-name"
                             />
@@ -123,6 +123,7 @@ export default function SignUp() {
                                 fullWidth
                                 id="email"
                                 name="email"
+                                type="email"
                                 label="이메일"
                                 autoComplete="email"
                             />
@@ -133,9 +134,9 @@ export default function SignUp() {
                                 fullWidth
                                 id="password"
                                 name="password"
+                                type={showPassword ? 'text' : 'password'}
                                 label="비밀번호"
                                 autoComplete="new-password"
-                                type={showPassword ? 'text' : 'password'}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
