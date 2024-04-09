@@ -102,15 +102,17 @@ export const SearchPost = () => {
     };
 
     return (
-        <Box component={'form'} onSubmit={handleSubmit}>
+        <Box
+            component={'form'}
+            onSubmit={handleSubmit}
+            width={'100%'}
+            maxWidth={500}
+        >
             <TextField
                 id="search-post"
                 name="search-post"
                 autoComplete="off"
-                sx={{
-                    width: '100%',
-                    maxWidth: 500,
-                }}
+                fullWidth
                 InputProps={{
                     sx: {
                         borderRadius: 7,

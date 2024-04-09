@@ -1,10 +1,12 @@
-import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import { SearchPost } from '@/components/common/searchbar';
+import { WritePost } from '@/components/common/write';
 
 export default function Home() {
     return (
-        <Container sx={{ textAlign: 'center' }}>
+        <Stack direction={'column'} alignItems={'center'} spacing={1}>
             <SearchPost />
-        </Container>
+            <WritePost />
+        </Stack>
     );
 }
