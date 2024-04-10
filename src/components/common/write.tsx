@@ -15,9 +15,9 @@ import Fade from '@mui/material/Fade';
 
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import FormatClearIcon from '@mui/icons-material/FormatClear';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
-import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import UndoIcon from '@mui/icons-material/Undo';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 
@@ -27,23 +27,17 @@ import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 
 export const WritePost = () => {
-    const CHAR_LIMIT = 250;
+    const CHAR_LIMIT = 500;
     const [showAlert, setShowAlert] = useState(false);
 
     const editor = useEditor({
         content: '',
         extensions: [
-            StarterKit.configure({
-                paragraph: {
-                    HTMLAttributes: {
-                        style: 'min-height: 100px; padding: 10px;',
-                    },
-                },
-            }),
+            StarterKit,
+            TiptapTypography,
             CharacterCount.configure({
                 limit: CHAR_LIMIT,
             }),
-            TiptapTypography,
         ],
     }) as Editor;
 
@@ -52,51 +46,45 @@ export const WritePost = () => {
             name: '굵게',
             command: 'bold',
             icon: <FormatBoldIcon />,
-            onclick: () => {
-                editor.chain().focus().toggleBold().run();
-            },
+            onclick: () => editor.chain().focus().toggleBold().run(),
         },
         {
             name: '기울임',
             command: 'italic',
             icon: <FormatItalicIcon />,
-            onclick: () => {
-                editor.chain().focus().toggleItalic().run();
-            },
+            onclick: () => editor.chain().focus().toggleItalic().run(),
         },
         {
-            name: '인용',
-            command: 'blockquote',
-            icon: <FormatQuoteIcon />,
-            onclick: () => {
-                editor.chain().focus().toggleBlockquote().run();
-            },
+            name: '효과 제거',
+            command: 'clear',
+            icon: <FormatClearIcon />,
+            onclick: () => editor.commands.unsetAllMarks(),
         },
     ];
     const toolOptions = [
         {
+            name: '되돌리기',
+            command: 'undo',
+            icon: <UndoIcon />,
+            onclick: () => editor.commands.undo(),
+        },
+        {
             name: '모두선택',
             command: 'selectAll',
             icon: <SelectAllIcon />,
-            onclick: () => {},
-        },
-        {
-            name: '이모지',
-            command: 'emoji',
-            icon: <InsertEmoticonIcon />,
-            onclick: () => {},
+            onclick: () => editor.commands.focus('all'),
         },
         {
             name: '사진',
             command: 'image',
             icon: <InsertPhotoIcon />,
-            onclick: () => {},
+            onclick: () => {}, // TODO photo upload function
         },
         {
             name: '링크',
             command: 'link',
             icon: <InsertLinkIcon />,
-            onclick: () => {},
+            onclick: () => {}, // TODO link upload function
         },
     ];
 
@@ -105,7 +93,7 @@ export const WritePost = () => {
             return setShowAlert(true);
         }
         const content = editor.getHTML();
-        console.log(content);
+        console.log(content); // TODO send post content to DB
         editor.commands.clearContent();
     };
 
@@ -125,14 +113,24 @@ export const WritePost = () => {
                         variant="outlined"
                         sx={{ width: '100%', borderRadius: 3 }}
                     >
-                        <Stack direction={'row'} p={0.5} width={'100%'}>
-                            <Box id={'editor'} width={'100%'} minHeight={100}>
+                        <Stack
+                            direction={'row'}
+                            spacing={0.5}
+                            p={0.5}
+                            width={'100%'}
+                        >
+                            <Box
+                                id={'editor'}
+                                width={'100%'}
+                                minHeight={100}
+                                p={1}
+                                onClick={() => editor.commands.focus()}
+                            >
                                 {editor?.isEmpty && !editor?.isFocused && (
                                     <Box
                                         component={'span'}
                                         color={'primary.light'}
                                         position={'absolute'}
-                                        p={1}
                                     >
                                         {'리프를 작성해 보세요 🌿'}
                                     </Box>
