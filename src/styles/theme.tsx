@@ -26,6 +26,7 @@ export const theme = extendTheme({
             palette: {
                 primary: { main: COLOR.THEME },
                 secondary: { main: COLOR.WHITE },
+                info: { main: COLOR.BLACK },
                 background: { default: COLOR.WHITE },
                 text: { primary: COLOR.BLACK, secondary: COLOR.THEME },
             },
@@ -34,6 +35,7 @@ export const theme = extendTheme({
             palette: {
                 primary: { main: COLOR.THEME },
                 secondary: { main: COLOR.BLACK },
+                info: { main: COLOR.WHITE },
                 background: { default: COLOR.BLACK },
                 text: { primary: COLOR.WHITE, secondary: COLOR.THEME },
             },
@@ -45,6 +47,12 @@ export const theme = extendTheme({
 				a {
 					color: inherit;
 					text-decoration: none;
+				}
+				p {
+					margin: 0;
+				}
+				#editor * {
+					outline: 0;
 				}
 			`,
         },

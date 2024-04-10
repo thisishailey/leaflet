@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
@@ -9,183 +9,242 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Fade from '@mui/material/Fade';
 
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import InsertLinkIcon from '@mui/icons-material/InsertLink';
 
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, BubbleMenu, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
-import Typography from '@tiptap/extension-typography';
+import CharacterCount from '@tiptap/extension-character-count';
+import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 
-const Tiptap = () => {
+export const WritePost = () => {
+    const CHAR_LIMIT = 250;
+    const [showAlert, setShowAlert] = useState(false);
+
     const editor = useEditor({
         content: '',
         extensions: [
-            StarterKit,
-            Placeholder.configure({ placeholder: '리프를 작성해 보세요!🌿' }),
-			Typography
+            StarterKit.configure({
+                paragraph: {
+                    HTMLAttributes: {
+                        style: 'min-height: 100px; padding: 10px;',
+                    },
+                },
+            }),
+            CharacterCount.configure({
+                limit: CHAR_LIMIT,
+            }),
+            TiptapTypography,
         ],
-    });
+    }) as Editor;
 
-    return <EditorContent editor={editor} width={'100%'} />;
-};
-
-const Editor = () => {
-    const [formats, setFormats] = useState<string[]>([]);
-    const [isEditor, setIsEditor] = useState<boolean>(false);
-
-    const formatOptions = useMemo(
-        () => [
-            {
-                name: '굵게',
-                command: 'bold',
-                tag: 'strong',
-                icon: <FormatBoldIcon />,
+    const formatOptions = [
+        {
+            name: '굵게',
+            command: 'bold',
+            icon: <FormatBoldIcon />,
+            onclick: () => {
+                editor.chain().focus().toggleBold().run();
             },
-            {
-                name: '기울이기',
-                command: 'italic',
-                tag: 'em',
-                icon: <FormatItalicIcon />,
+        },
+        {
+            name: '기울임',
+            command: 'italic',
+            icon: <FormatItalicIcon />,
+            onclick: () => {
+                editor.chain().focus().toggleItalic().run();
             },
-            {
-                name: '밑줄',
-                command: 'underline',
-                tag: 'u',
-                icon: <FormatUnderlinedIcon />,
+        },
+        {
+            name: '인용',
+            command: 'blockquote',
+            icon: <FormatQuoteIcon />,
+            onclick: () => {
+                editor.chain().focus().toggleBlockquote().run();
             },
-        ],
-        []
-    );
-
-    document.addEventListener('selectionchange', (event: Event) => {
-        const editor = document.querySelector('#wysiwyg-editor');
-        if ((event.target as Document).activeElement === editor) {
-            setIsEditor(true);
-        } else {
-            setIsEditor(false);
-        }
-    });
-
-    useEffect(() => {
-        const selection = document.getSelection();
-        const selectedFormat = formatOptions.filter((option) =>
-            formats.includes(option.command)
-        );
-
-        if (selection) {
-            if (!isEditor) {
-                return;
-            }
-
-            const selectedText = selection.getRangeAt(0);
-            console.log(selectedText);
-            const element = document.createElement(selectedFormat[0].tag);
-            selectedText.surroundContents(element);
-        }
-    }, [formatOptions, formats, isEditor]);
-
-    const handleFormat = (
-        _event: React.MouseEvent<HTMLElement>,
-        newFormats: string[]
-    ) => {
-        setFormats(newFormats);
-    };
-
+        },
+    ];
     const toolOptions = [
         {
             name: '모두선택',
             command: 'selectAll',
-            onclick: () => {},
             icon: <SelectAllIcon />,
+            onclick: () => {},
         },
         {
             name: '이모지',
             command: 'emoji',
-            onclick: () => {},
             icon: <InsertEmoticonIcon />,
+            onclick: () => {},
         },
         {
             name: '사진',
             command: 'image',
-            onclick: () => {},
             icon: <InsertPhotoIcon />,
+            onclick: () => {},
         },
         {
             name: '링크',
             command: 'link',
-            onclick: () => {},
             icon: <InsertLinkIcon />,
+            onclick: () => {},
         },
     ];
 
-    return (
-        <Paper variant="outlined" sx={{ width: '100%' }}>
-            <Stack direction={'row'} p={0.5} width={'100%'}>
-                {/* <Box
-                    contentEditable
-                    id="wysiwyg-editor"
-                    width={'100%'}
-                    minHeight={100}
-                /> */}
-                <Tiptap />
-                <ToggleButtonGroup
-                    size="small"
-                    orientation="vertical"
-                    aria-label="editor tools"
-                >
-                    {toolOptions.map((option) => (
-                        <ToggleButton
-                            key={option.command}
-                            value={option.command}
-                            aria-label={option.command}
-                            onClick={option.onclick}
-                        >
-                            {option.icon}
-                        </ToggleButton>
-                    ))}
-                </ToggleButtonGroup>
-            </Stack>
-            <Divider />
-            <Box p={1}>{'사진 / 링크 프리뷰'}</Box>
-        </Paper>
-    );
-};
-
-export const WritePost = () => {
-    const [value, setValue] = useState('');
-
     const handleSubmit = () => {
-        console.log(value);
-        setValue('');
+        if (editor.isEmpty) {
+            return setShowAlert(true);
+        }
+        const content = editor.getHTML();
+        console.log(content);
+        editor.commands.clearContent();
     };
 
     return (
-        <Paper variant="outlined" sx={{ width: '100%', maxWidth: 900 }}>
-            <Stack direction={'row'} spacing={2} width={'100%'} p={1}>
-                <Editor />
+        <>
+            <Paper
+                variant="outlined"
+                sx={{ width: '100%', maxWidth: 900, borderRadius: 4 }}
+            >
                 <Stack
-                    direction={'column'}
-                    spacing={1}
-                    alignItems={'center'}
-                    justifyContent={'space-between'}
+                    direction={{ xs: 'column', sm: 'row' }}
+                    spacing={{ xs: 0, sm: 1 }}
+                    width={'100%'}
+                    p={1.5}
                 >
-                    <Box>
-                        <Avatar />
-                    </Box>
-                    <Box>
-                        <Button variant="contained" onClick={handleSubmit}>
+                    <Paper
+                        variant="outlined"
+                        sx={{ width: '100%', borderRadius: 3 }}
+                    >
+                        <Stack direction={'row'} p={0.5} width={'100%'}>
+                            <Box id={'editor'} width={'100%'} minHeight={100}>
+                                {editor?.isEmpty && !editor?.isFocused && (
+                                    <Box
+                                        component={'span'}
+                                        color={'primary.light'}
+                                        position={'absolute'}
+                                        p={1}
+                                    >
+                                        {'리프를 작성해 보세요 🌿'}
+                                    </Box>
+                                )}
+                                <EditorContent editor={editor} />
+                                {editor && (
+                                    <BubbleMenu
+                                        editor={editor}
+                                        tippyOptions={{ duration: 100 }}
+                                    >
+                                        <ToggleButtonGroup>
+                                            {formatOptions.map((option) => (
+                                                <ToggleButton
+                                                    size="small"
+                                                    sx={{
+                                                        bgcolor:
+                                                            'secondary.main',
+                                                        p: 0.5,
+                                                        '&:hover': {
+                                                            bgcolor:
+                                                                'secondary.dark',
+                                                        },
+                                                    }}
+                                                    key={option.command}
+                                                    value={option.command}
+                                                    onClick={option.onclick}
+                                                    className={
+                                                        editor.isActive(
+                                                            option.command
+                                                        )
+                                                            ? 'is-active'
+                                                            : ''
+                                                    }
+                                                >
+                                                    {option.icon}
+                                                </ToggleButton>
+                                            ))}
+                                        </ToggleButtonGroup>
+                                    </BubbleMenu>
+                                )}
+                            </Box>
+                            <ToggleButtonGroup
+                                size="small"
+                                orientation={'vertical'}
+                                aria-label="editor tools"
+                            >
+                                {toolOptions.map((option) => (
+                                    <ToggleButton
+                                        key={option.command}
+                                        value={option.command}
+                                        aria-label={option.command}
+                                        onClick={option.onclick}
+                                        sx={{ borderRadius: 2 }}
+                                    >
+                                        {option.icon}
+                                    </ToggleButton>
+                                ))}
+                            </ToggleButtonGroup>
+                        </Stack>
+                        <Divider />
+                        <Stack
+                            direction={'row'}
+                            justifyContent={'space-between'}
+                            p={1}
+                        >
+                            <Box fontSize={'14px'}>{'사진 / 링크 프리뷰'}</Box>
+                            <Typography fontSize={'14px'}>
+                                {`${
+                                    editor?.storage.characterCount.characters() ||
+                                    0
+                                }/${CHAR_LIMIT} 자`}
+                            </Typography>
+                        </Stack>
+                    </Paper>
+                    <Stack
+                        direction={'column'}
+                        spacing={1}
+                        alignItems={{ xs: 'flex-end', sm: 'center' }}
+                        justifyContent={'space-between'}
+                    >
+                        <Avatar
+                            sx={{
+                                bgcolor: 'primary.light',
+                                color: 'secondary.main',
+                                display: { xs: 'none', sm: 'flex' },
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            onClick={handleSubmit}
+                            sx={{ borderRadius: 4.5, fontWeight: 600 }}
+                        >
                             {'리프'}
                         </Button>
-                    </Box>
+                    </Stack>
                 </Stack>
-            </Stack>
-        </Paper>
+            </Paper>
+            <Fade
+                in={showAlert}
+                addEndListener={() =>
+                    setTimeout(() => {
+                        setShowAlert(false);
+                    }, 2000)
+                }
+            >
+                <Alert
+                    severity="error"
+                    sx={{ width: '100%', maxWidth: 900, borderRadius: 2 }}
+                >
+                    {'내용을 입력해 주세요.'}
+                </Alert>
+            </Fade>
+        </>
     );
 };
