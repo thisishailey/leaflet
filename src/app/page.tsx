@@ -1,5 +1,5 @@
 import Stack from '@mui/material/Stack';
-import { SearchPost } from '@/components/common/searchbar';
+import { SearchPost } from '@/components/common/search';
 import { WritePost } from '@/components/common/write';
 
 export default function Home() {
