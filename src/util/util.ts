@@ -12,3 +12,8 @@ export const emptyValue = (selector: string) => {
     const element = document.querySelector(selector) as HTMLInputElement;
     element.value = '';
 };
+
+export const getValue = (selector: string) => {
+    const element = document.querySelector(selector) as HTMLInputElement;
+    return element.value;
+};

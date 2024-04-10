@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Chip from '@mui/material/Chip';
 import SearchIcon from '@mui/icons-material/Search';
-import { setFocus, removeFocus, emptyValue } from '@/util/util';
+import { setFocus, removeFocus, emptyValue, getValue } from '@/util/util';
 
 interface SearchPostValue {
     value: string;
@@ -48,7 +48,7 @@ export const SearchPost = () => {
     };
 
     const handleKeydown = (event: React.KeyboardEvent) => {
-        if (event.key === 'Backspace') {
+        if (event.key === 'Backspace' && getValue('#search-post') === '') {
             setSearchValue(searchValue.slice(0, -1));
         }
     };
