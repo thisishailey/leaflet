@@ -7,49 +7,89 @@ import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
-const WYSIWYG = () => {
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
+
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
+import Typography from '@tiptap/extension-typography';
+
+const Tiptap = () => {
+    const editor = useEditor({
+        content: '',
+        extensions: [
+            StarterKit,
+            Placeholder.configure({ placeholder: '리프를 작성해 보세요!🌿' }),
+			Typography
+        ],
+    });
+
+    return <EditorContent editor={editor} width={'100%'} />;
+};
+
+const Editor = () => {
     const [formats, setFormats] = useState<string[]>([]);
-    const [isBold, setIsBold] = useState(false);
-    const [isItalic, setIsItalic] = useState(false);
-    const [isUnderline, setIsUnderline] = useState(false);
+    const [isEditor, setIsEditor] = useState<boolean>(false);
 
     const formatOptions = useMemo(
         () => [
             {
                 name: '굵게',
                 command: 'bold',
-                on: () => setIsBold(true),
-                off: () => setIsBold(false),
+                tag: 'strong',
+                icon: <FormatBoldIcon />,
             },
             {
                 name: '기울이기',
                 command: 'italic',
-                on: () => setIsItalic(true),
-                off: () => setIsItalic(false),
+                tag: 'em',
+                icon: <FormatItalicIcon />,
             },
             {
                 name: '밑줄',
                 command: 'underline',
-                on: () => setIsUnderline(true),
-                off: () => setIsUnderline(false),
+                tag: 'u',
+                icon: <FormatUnderlinedIcon />,
             },
         ],
         []
     );
 
+    document.addEventListener('selectionchange', (event: Event) => {
+        const editor = document.querySelector('#wysiwyg-editor');
+        if ((event.target as Document).activeElement === editor) {
+            setIsEditor(true);
+        } else {
+            setIsEditor(false);
+        }
+    });
+
     useEffect(() => {
-        formatOptions.forEach((option) => {
-            if (formats.includes(option.command)) {
-                option.on();
-            } else {
-                option.off();
+        const selection = document.getSelection();
+        const selectedFormat = formatOptions.filter((option) =>
+            formats.includes(option.command)
+        );
+
+        if (selection) {
+            if (!isEditor) {
+                return;
             }
-        });
-    }, [formatOptions, formats]);
+
+            const selectedText = selection.getRangeAt(0);
+            console.log(selectedText);
+            const element = document.createElement(selectedFormat[0].tag);
+            selectedText.surroundContents(element);
+        }
+    }, [formatOptions, formats, isEditor]);
 
     const handleFormat = (
         _event: React.MouseEvent<HTMLElement>,
@@ -58,61 +98,63 @@ const WYSIWYG = () => {
         setFormats(newFormats);
     };
 
-    const handleBoldOn = () => {
-        const strongElement = document.createElement('strong');
-        const userSelection = window.getSelection();
-        if (userSelection) {
-            console.log(userSelection);
-            const selectedTextRange = userSelection.getRangeAt(0);
-            selectedTextRange.surroundContents(strongElement);
-        } else {
-        }
-    };
-
-    const helperOptions = [
-        { name: '모두선택', command: 'selectAll', onclick: () => {} },
-        { name: '이모지', command: 'emoji', onclick: () => {} },
-        { name: '사진', command: 'image', onclick: () => {} },
-        { name: '링크', command: 'link', onclick: () => {} },
+    const toolOptions = [
+        {
+            name: '모두선택',
+            command: 'selectAll',
+            onclick: () => {},
+            icon: <SelectAllIcon />,
+        },
+        {
+            name: '이모지',
+            command: 'emoji',
+            onclick: () => {},
+            icon: <InsertEmoticonIcon />,
+        },
+        {
+            name: '사진',
+            command: 'image',
+            onclick: () => {},
+            icon: <InsertPhotoIcon />,
+        },
+        {
+            name: '링크',
+            command: 'link',
+            onclick: () => {},
+            icon: <InsertLinkIcon />,
+        },
     ];
 
     return (
-        <Box>
-            <Stack direction={'row'} p={0.5}>
+        <Paper variant="outlined" sx={{ width: '100%' }}>
+            <Stack direction={'row'} p={0.5} width={'100%'}>
+                {/* <Box
+                    contentEditable
+                    id="wysiwyg-editor"
+                    width={'100%'}
+                    minHeight={100}
+                /> */}
+                <Tiptap />
                 <ToggleButtonGroup
                     size="small"
-                    value={formats}
-                    onChange={handleFormat}
-                    aria-label="text formatting"
+                    orientation="vertical"
+                    aria-label="editor tools"
                 >
-                    {formatOptions.map((option) => (
+                    {toolOptions.map((option) => (
                         <ToggleButton
                             key={option.command}
                             value={option.command}
                             aria-label={option.command}
+                            onClick={option.onclick}
                         >
-                            {option.name}
+                            {option.icon}
                         </ToggleButton>
                     ))}
                 </ToggleButtonGroup>
-                <Divider flexItem orientation="vertical" sx={{ m: 0.5 }} />
-                <ButtonGroup>
-                    {helperOptions.map((option) => (
-                        <Button
-                            key={option.command}
-                            aria-label={option.command}
-                            onClick={option.onclick}
-                        >
-                            {option.name}
-                        </Button>
-                    ))}
-                </ButtonGroup>
-                <Divider flexItem orientation="vertical" sx={{ m: 0.5 }} />
             </Stack>
-            <Paper variant="outlined">
-                <Box contentEditable id="wysiwyg-editor" minHeight={100} />
-            </Paper>
-        </Box>
+            <Divider />
+            <Box p={1}>{'사진 / 링크 프리뷰'}</Box>
+        </Paper>
     );
 };
 
@@ -127,9 +169,7 @@ export const WritePost = () => {
     return (
         <Paper variant="outlined" sx={{ width: '100%', maxWidth: 900 }}>
             <Stack direction={'row'} spacing={2} width={'100%'} p={1}>
-                <Box width={'100%'}>
-                    <WYSIWYG />
-                </Box>
+                <Editor />
                 <Stack
                     direction={'column'}
                     spacing={1}
