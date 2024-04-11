@@ -1,6 +1,7 @@
 import { initializeApp, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,13 +13,14 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp;
+let firebaseApp: FirebaseApp;
 try {
-    app = getApp('firebaseApp');
+    firebaseApp = getApp('firebaseApp');
 } catch (e) {
-    app = initializeApp(firebaseConfig, 'firebaseApp');
+    firebaseApp = initializeApp(firebaseConfig, 'firebaseApp');
 }
 
-export const firebaseApp = app;
-export const firebaseAuth = getAuth(firebaseApp);
-export const firestoreDb = getFirestore(firebaseApp);
+export const app = firebaseApp;
+export const auth = getAuth(app);
+export const firestore = getFirestore(app);
+export const storage = getStorage(app);

@@ -24,6 +24,7 @@ A social media platform for book-lovers.
 -   Backend & DB
     -   Firebase Authentication
     -   Firebase Cloud Firestore
+    -   Firebase Storage
     -   Vercel
 -   Other
     -   Git

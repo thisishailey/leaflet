@@ -1,4 +1,4 @@
-import { firebaseAuth } from '../config';
+import { auth } from '../config';
 import { signOut } from 'firebase/auth';
 
 export default async function authSignOut() {
@@ -6,7 +6,7 @@ export default async function authSignOut() {
         error = null;
 
     try {
-        await signOut(firebaseAuth);
+        await signOut(auth);
     } catch (e) {
         error = e;
     }

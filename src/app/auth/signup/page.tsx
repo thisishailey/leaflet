@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import authSignUp from '@/firebase/auth/signup';
 import addData from '@/firebase/db/addData';
+import updateData from '@/firebase/db/updateData';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -17,9 +18,12 @@ import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import Fade from '@mui/material/Fade';
 import { CopyrightShort } from '@/components/common/copyright';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import uploadFile from '@/firebase/storage/uploadFile';
 
 const steps = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
 
@@ -29,6 +33,7 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>('');
     const [userName, setUserName] = useState<string>('');
     const [userImage, setUserImage] = useState<string>('');
+    const [alert, setAlert] = useState<string>('');
     const [showPassword, setShowPassword] = useState(false);
 
     const handleTogglePasswordVisibility = () => {
@@ -61,19 +66,23 @@ export default function SignUp() {
         }
     };
 
+    const handleNextStep = () => {
+        setAlert('');
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
     const handleStepOne = async (data: FormData) => {
         const email = data.get('email') as string;
         setEmail(email);
         const password = data.get('password') as string;
 
-        const { result, error } = await authSignUp({ email, password });
+        const { error } = await authSignUp({ email, password });
 
         if (error) {
-            return console.log(error);
+            return setAlert(error.message);
         }
 
-        console.log(result);
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        handleNextStep();
     };
 
     const handleStepTwo = async (data: FormData) => {
@@ -82,7 +91,7 @@ export default function SignUp() {
         const firstName = data.get('firstName') as string;
         const lastName = data.get('lastName') as string;
 
-        const { result, error } = await addData('user', email, {
+        const { error } = await addData('user', email, {
             email,
             userName,
             firstName,
@@ -90,19 +99,41 @@ export default function SignUp() {
         });
 
         if (error) {
-            return console.log(error);
+            return setAlert(error.message);
         }
 
-        console.log(result);
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        handleNextStep();
     };
 
     const handleStepThree = async (data: FormData) => {
-        const image = data.get('image') as string;
+        const image = data.get('image') as File;
         const description = data.get('description') as string;
 
-        console.log(image, description);
+        if (!image && !description) {
+            return;
+        }
 
+        let newData = {};
+        if (image) {
+            const { error, imageUrl } = await uploadFile('userProfile', image);
+
+            if (error) {
+                return setAlert(error.message);
+            }
+
+            newData = { profileImg: imageUrl };
+        }
+        if (description) {
+            newData = { ...newData, description };
+        }
+
+        const { error } = await updateData('user', email, newData);
+
+        if (error) {
+            return setAlert(error.message);
+        }
+
+        setAlert('');
         replace('/user');
     };
 
@@ -113,13 +144,27 @@ export default function SignUp() {
             </style>
             <Box
                 sx={{
-                    mt: { xs: 0, sm: 2, md: 8 },
+                    mt: { xs: 0, sm: 2, md: 4 },
                     padding: 2,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}
             >
+                <Fade in={alert !== ''}>
+                    <Alert
+                        severity="error"
+                        sx={{
+                            width: '100%',
+                            maxWidth: 900,
+                            mb: 4,
+                            borderRadius: 2,
+                            display: alert ? 'flex' : 'none',
+                        }}
+                    >
+                        {alert}
+                    </Alert>
+                </Fade>
                 <Stepper
                     activeStep={activeStep}
                     alternativeLabel
@@ -136,7 +181,7 @@ export default function SignUp() {
                     onSubmit={handleSubmit}
                     width={'100%'}
                     maxWidth={'397px'}
-                    mt={{ xs: 4, md: 6 }}
+                    mt={{ xs: 6, md: 8 }}
                 >
                     {activeStep === 0 && (
                         <>
@@ -288,7 +333,7 @@ export default function SignUp() {
                         type="submit"
                         variant="contained"
                         sx={{
-                            mt: 4,
+                            mt: 6,
                             padding: '10px',
                             fontSize: '16px',
                             fontWeight: 500,

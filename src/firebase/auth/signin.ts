@@ -1,4 +1,4 @@
-import { firebaseAuth } from '../config';
+import { auth } from '../config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import type { UserCredential } from 'firebase/auth';
 
@@ -8,7 +8,7 @@ export default async function authSignIn(email: string, password: string) {
 
     try {
         result = await signInWithEmailAndPassword(
-            firebaseAuth,
+            auth,
             email,
             password
         );

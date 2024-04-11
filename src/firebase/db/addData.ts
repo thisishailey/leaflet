@@ -1,4 +1,4 @@
-import { firestoreDb } from '../config';
+import { firestore } from '../config';
 import { doc, setDoc } from 'firebase/firestore';
 import type { Collection, Data } from './model';
 
@@ -7,13 +7,13 @@ export default async function addData(
     id: string,
     data: Data
 ) {
-    let result = null,
-        error = null;
+    let result: string | null = null,
+        error: Error | null = null;
 
     try {
-        await setDoc(doc(firestoreDb, collection, id), data);
+        await setDoc(doc(firestore, collection, id), data);
     } catch (e) {
-        error = e;
+        error = e as Error;
     }
 
     if (!error) {
