@@ -49,9 +49,7 @@ export default function UserProfile({ id }: { id: string }) {
                             {'프로필 이름'}
                         </Typography>
                         <Typography>
-                            {data.profilename
-                                ? data.profilename
-                                : data.firstname}
+                            {data.username ? data.username : data.firstname}
                         </Typography>
                     </Box>
                 </>
