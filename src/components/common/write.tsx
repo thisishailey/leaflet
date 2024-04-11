@@ -238,7 +238,12 @@ export const WritePost = () => {
             >
                 <Alert
                     severity="error"
-                    sx={{ width: '100%', maxWidth: 900, borderRadius: 2 }}
+                    sx={{
+                        width: '100%',
+                        maxWidth: 900,
+                        borderRadius: 2,
+                        display: showAlert ? 'flex' : 'none',
+                    }}
                 >
                     {'내용을 입력해 주세요.'}
                 </Alert>
