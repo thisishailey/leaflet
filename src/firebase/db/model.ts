@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export type Collection = UserCollection | PostCollection;
 export type Data = UserData | PostData;
@@ -9,9 +9,9 @@ export type UserCollection = 'user';
 export const COLLECTION_USER: UserCollection = 'user';
 
 export interface UserData {
-    firstName: string;
-    lastName: string;
-    userName: string;
+    firstname: string;
+    lastname: string;
+    username: string;
     email: string; // key
     profileImg?: string;
     description?: string;
@@ -19,12 +19,13 @@ export interface UserData {
     following?: string[];
     wishlist?: string[];
     bookmark?: string[];
+    timestamp?: Timestamp;
 }
 
 export interface UserDataUpdate {
-    firstName?: string;
-    lastName?: string;
-    userName?: string; 
+    firstname?: string;
+    lastname?: string;
+    username?: string;
     profileImg?: string;
     description?: string;
     followers?: string[];
@@ -40,11 +41,13 @@ export const COLLECTION_POST: PostCollection = 'post';
 export interface PostData {
     email: string; // user key
     content: string;
-    timestamp: Timestamp;
+    images?: string[];
+    timestamp?: Timestamp;
 }
 
 export interface PostDataUpdate {
-    content: string;
+    content?: string;
+    images?: string[];
 }
 
 // review

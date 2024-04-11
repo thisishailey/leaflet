@@ -42,16 +42,16 @@ export default function UserProfile({ id }: { id: string }) {
                     </Box>
                     <Box display={'flex'} gap={'2rem'}>
                         <Typography fontWeight={500}>{'이름'}</Typography>
-                        <Typography>{data.firstName}</Typography>
+                        <Typography>{data.firstname}</Typography>
                     </Box>
                     <Box display={'flex'} gap={'2rem'}>
                         <Typography fontWeight={500}>
                             {'프로필 이름'}
                         </Typography>
                         <Typography>
-                            {data.profileName
-                                ? data.profileName
-                                : data.firstName}
+                            {data.profilename
+                                ? data.profilename
+                                : data.firstname}
                         </Typography>
                     </Box>
                 </>

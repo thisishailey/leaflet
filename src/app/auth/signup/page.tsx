@@ -31,7 +31,7 @@ export default function SignUp() {
     const { replace } = useRouter();
     const [activeStep, setActiveStep] = useState(0);
     const [email, setEmail] = useState<string>('');
-    const [userName, setUserName] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
     const [userImage, setUserImage] = useState<string>('');
     const [alert, setAlert] = useState<string>('');
     const [showPassword, setShowPassword] = useState(false);
@@ -86,17 +86,23 @@ export default function SignUp() {
     };
 
     const handleStepTwo = async (data: FormData) => {
-        const userName = data.get('userName') as string;
-        setUserName(userName);
-        const firstName = data.get('firstName') as string;
-        const lastName = data.get('lastName') as string;
+        const username = data.get('username') as string;
+        setUsername(username);
+        const firstname = data.get('firstname') as string;
+        const lastname = data.get('lastname') as string;
 
-        const { error } = await addData('user', email, {
-            email,
-            userName,
-            firstName,
-            lastName,
-        });
+        // TODO check username availability
+
+        const { error } = await addData(
+            'user',
+            {
+                email,
+                username,
+                firstname,
+                lastname,
+            },
+            email
+        );
 
         if (error) {
             return setAlert(error.message);
@@ -243,8 +249,8 @@ export default function SignUp() {
                                 <TextField
                                     required
                                     fullWidth
-                                    id="lastName"
-                                    name="lastName"
+                                    id="lastname"
+                                    name="lastname"
                                     type="string"
                                     label="성"
                                     autoComplete="family-name"
@@ -253,8 +259,8 @@ export default function SignUp() {
                                 <TextField
                                     required
                                     fullWidth
-                                    id="firstName"
-                                    name="firstName"
+                                    id="firstname"
+                                    name="firstname"
                                     type="string"
                                     label="이름"
                                     autoComplete="given-name"
@@ -263,8 +269,8 @@ export default function SignUp() {
                             <TextField
                                 required
                                 fullWidth
-                                id="userName"
-                                name="userName"
+                                id="username"
+                                name="username"
                                 type="string"
                                 label="아이디"
                                 autoComplete="username"
@@ -285,7 +291,7 @@ export default function SignUp() {
                             >
                                 <Avatar
                                     src={userImage}
-                                    alt={userName}
+                                    alt={username}
                                     sx={{
                                         width: 60,
                                         height: 60,
@@ -294,7 +300,7 @@ export default function SignUp() {
                                         img: { width: 60, height: 60 },
                                     }}
                                 >
-                                    {userName}
+                                    {username}
                                 </Avatar>
                                 <Button size="large">
                                     <Box
