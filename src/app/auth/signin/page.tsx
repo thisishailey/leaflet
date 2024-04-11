@@ -70,7 +70,7 @@ export default function SignIn() {
                     <TextField
                         required
                         fullWidth
-                        margin="normal"
+                        margin="dense"
                         id="email"
                         name="email"
                         type="email"
@@ -81,6 +81,7 @@ export default function SignIn() {
                     <TextField
                         required
                         fullWidth
+                        margin="dense"
                         id="password"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
