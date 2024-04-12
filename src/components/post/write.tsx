@@ -44,6 +44,7 @@ export const WritePost = () => {
     const CHAR_LIMIT = 500;
     const { user } = useAuthContext();
     const [open, setOpen] = useState(false);
+    const [isNotUser, setIsNotUser] = useState(false);
     const [alert, setAlert] = useState<string>('');
     const [complete, setComplete] = useState<string>('');
     const [username, setUsername] = useState<string>('');
@@ -55,8 +56,9 @@ export const WritePost = () => {
     useEffect(() => {
         const loadProfile = async () => {
             if (!user) {
-                return;
+                return setIsNotUser(true);
             }
+            setIsNotUser(false);
 
             const { result, error } = await getData(
                 COLLECTION_USER,
@@ -200,7 +202,7 @@ export const WritePost = () => {
 
     return (
         <>
-            {user ? (
+            {user && (
                 <>
                     <Backdrop
                         open={open}
@@ -260,11 +262,10 @@ export const WritePost = () => {
                                                     {formatOptions.map(
                                                         (option) => (
                                                             <ToggleButton
-                                                                size="small"
                                                                 sx={{
                                                                     bgcolor:
                                                                         'secondary.main',
-                                                                    p: 0.5,
+                                                                    p: 1,
                                                                     '&:hover': {
                                                                         bgcolor:
                                                                             'secondary.dark',
@@ -427,7 +428,8 @@ export const WritePost = () => {
                         </Alert>
                     </Fade>
                 </>
-            ) : (
+            )}
+            {isNotUser && (
                 <Paper
                     variant="outlined"
                     sx={{

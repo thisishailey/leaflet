@@ -4,35 +4,57 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Link from 'next/link';
 
 interface PreviewProps {
+    id: string;
     username: string;
     content: string;
+    profileSrc: string;
 }
 
-export function PostPreview({ username, content }: PreviewProps) {
+export function PostPreview({
+    id,
+    username,
+    content,
+    profileSrc,
+}: PreviewProps) {
     return (
-        <Card
-            sx={{ width: '100%', maxWidth: 900, borderRadius: 4 }}
-            variant="outlined"
+        <Link
+            href={`/post/${id}`}
+            style={{
+                width: '100%',
+                maxWidth: '900px',
+                display: 'flex',
+                justifyContent: 'center',
+            }}
         >
-            <CardHeader
-                avatar={
-                    <Avatar
-                        sx={{
-                            bgcolor: 'primary.light',
-                            color: 'secondary.main',
-                        }}
-                    />
-                }
-                action={
-                    <IconButton>
-                        <MoreHorizIcon />
-                    </IconButton>
-                }
-                title={username}
-            />
-            <CardContent sx={{ pt: 0 }}>{content}</CardContent>
-        </Card>
+            <Card
+                sx={{
+                    width: '100%',
+                    maxWidth: 900,
+                    borderRadius: 4,
+                    cursor: 'pointer',
+                }}
+                variant="outlined"
+            >
+                <CardHeader
+                    avatar={
+                        <Avatar src={profileSrc}>
+                            {!profileSrc && username}
+                        </Avatar>
+                    }
+                    action={
+                        <IconButton>
+                            <MoreHorizIcon />
+                        </IconButton>
+                    }
+                    title={username}
+                />
+                <CardContent sx={{ pt: 0 }}>
+                    <div dangerouslySetInnerHTML={{ __html: content }}></div>
+                </CardContent>
+            </Card>
+        </Link>
     );
 }
