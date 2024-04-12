@@ -38,6 +38,7 @@ import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 import getFile from '@/firebase/storage/getFile';
+import Link from 'next/link';
 
 export const WritePost = () => {
     const CHAR_LIMIT = 500;
@@ -199,7 +200,7 @@ export const WritePost = () => {
 
     return (
         <>
-            {user && (
+            {user ? (
                 <>
                     <Backdrop
                         open={open}
@@ -426,6 +427,40 @@ export const WritePost = () => {
                         </Alert>
                     </Fade>
                 </>
+            ) : (
+                <Paper
+                    variant="outlined"
+                    sx={{
+                        width: '100%',
+                        maxWidth: 900,
+                        p: 2,
+                        borderRadius: 4,
+                        bgcolor: 'primary.light',
+                    }}
+                >
+                    <Stack
+                        direction={'row'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        spacing={2}
+                    >
+                        <Link href={'/auth/signin'}>
+                            <Button
+                                size="large"
+                                color="secondary"
+                                variant="outlined"
+                            >
+                                {'로그인 / 회원가입'}
+                            </Button>
+                        </Link>
+                        <Typography
+                            color={'secondary.main'}
+                            display={{ xs: 'none', sm: 'block' }}
+                        >
+                            {'하고 리프를 작성해 보세요!'}
+                        </Typography>
+                    </Stack>
+                </Paper>
             )}
         </>
     );
