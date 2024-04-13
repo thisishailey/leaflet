@@ -24,9 +24,9 @@ export interface UserData {
 }
 
 export interface UserDataUpdate {
-    username: string; // unique
-    firstname: string;
-    lastname: string;
+    username?: string; // unique
+    firstname?: string;
+    lastname?: string;
     profileImg?: string; // unique
     bio?: string;
     follower?: string[];

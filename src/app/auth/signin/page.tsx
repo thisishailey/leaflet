@@ -4,21 +4,40 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import authSignIn from '@/firebase/auth/signin';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
+
 import { CopyrightShort } from '@/components/common/copyright';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Fade from '@mui/material/Fade';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function SignIn() {
     const { replace } = useRouter();
+    const [alert, setAlert] = useState<string>('');
     const [showPassword, setShowPassword] = useState(false);
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleSignIn = async (email: string, password: string) => {
+        const { error } = await authSignIn(email, password);
+
+        if (error) {
+            return setAlert(error.message);
+        }
+
+        return replace('/user/following');
+    };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -28,21 +47,6 @@ export default function SignIn() {
         const password = data.get('password') as string;
 
         handleSignIn(email, password);
-    };
-
-    const handleSignIn = async (email: string, password: string) => {
-        const { result, error } = await authSignIn(email, password);
-
-        if (error) {
-            return console.log(error);
-        }
-
-        console.log(result);
-        return replace('/user/following');
-    };
-
-    const handleTogglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
     };
 
     return (
@@ -59,6 +63,20 @@ export default function SignIn() {
                     alignItems: 'center',
                 }}
             >
+                <Fade in={alert !== ''}>
+                    <Alert
+                        severity="error"
+                        sx={{
+                            width: '100%',
+                            maxWidth: 900,
+                            mb: 4,
+                            borderRadius: 2,
+                            display: alert ? 'flex' : 'none',
+                        }}
+                    >
+                        {alert}
+                    </Alert>
+                </Fade>
                 <Typography component="h3" fontSize={'28px'} fontWeight={500}>
                     {'로그인'}
                 </Typography>

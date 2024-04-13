@@ -5,36 +5,41 @@ import { useRouter } from 'next/navigation';
 import authSignUp from '@/firebase/auth/signup';
 import addData from '@/firebase/db/addData';
 import updateData from '@/firebase/db/updateData';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
+import uploadFile from '@/firebase/storage/uploadFile';
+import { COLLECTION_USER, type UserDataUpdate } from '@/firebase/db/model';
+
+import { CopyrightShort } from '@/components/common/copyright';
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import Fade from '@mui/material/Fade';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Alert from '@mui/material/Alert';
-import Fade from '@mui/material/Fade';
-import { CopyrightShort } from '@/components/common/copyright';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
+import TextField from '@mui/material/TextField';
+
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import uploadFile from '@/firebase/storage/uploadFile';
 
 const steps = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
 
 export default function SignUp() {
     const { replace } = useRouter();
+
+    const [alert, setAlert] = useState<string>('');
+    const [showPassword, setShowPassword] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
+
     const [email, setEmail] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [userImage, setUserImage] = useState<string>('');
-    const [alert, setAlert] = useState<string>('');
-    const [showPassword, setShowPassword] = useState(false);
 
     const handleTogglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -94,7 +99,7 @@ export default function SignUp() {
         // TODO check username availability
 
         const { error } = await addData(
-            'user',
+            COLLECTION_USER,
             {
                 email,
                 username,
@@ -113,13 +118,13 @@ export default function SignUp() {
 
     const handleStepThree = async (data: FormData) => {
         const image = data.get('image') as File;
-        const description = data.get('description') as string;
+        const bio = data.get('bio') as string;
 
-        if (!image && !description) {
+        if (!image && !bio) {
             return;
         }
 
-        let newData = {};
+        let newData: UserDataUpdate = {};
         if (image) {
             const { error, imageUrl } = await uploadFile('userProfile', image);
 
@@ -129,8 +134,8 @@ export default function SignUp() {
 
             newData = { profileImg: imageUrl };
         }
-        if (description) {
-            newData = { ...newData, description };
+        if (bio) {
+            newData = { ...newData, bio };
         }
 
         const { error } = await updateData('user', email, newData);
@@ -326,8 +331,8 @@ export default function SignUp() {
                                 multiline
                                 rows={4}
                                 margin="normal"
-                                id="description"
-                                name="description"
+                                id="bio"
+                                name="bio"
                                 type="string"
                                 label="바이오"
                                 placeholder="나를 소개해 보세요!"
