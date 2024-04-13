@@ -62,7 +62,7 @@ export type CommentCollection = 'comment';
 export const COLLECTION_COMMENT: CommentCollection = 'comment';
 
 export interface CommentData {
-    id: string; // primary key, automatic, no update
+    _id?: string; // primary key, automatic, no update
     email: string; // foreign key (user), no update
     content: string;
     timestamp?: Timestamp; // automatic, no update

@@ -5,8 +5,14 @@ import {
     collection as col,
     setDoc,
     addDoc,
+    DocumentReference,
 } from 'firebase/firestore';
-import type { Collection, Data } from './model';
+import {
+    COLLECTION_COMMENT,
+    CommentData,
+    type Collection,
+    type Data,
+} from './model';
 
 export default async function addData(
     collection: Collection,
@@ -37,4 +43,25 @@ export default async function addData(
     }
 
     return { result, error };
+}
+
+export async function addComment(data: CommentData) {
+    let docRef: DocumentReference | null = null,
+        commentId: string | null = null,
+        error: Error | null = null;
+
+    try {
+        docRef = await addDoc(col(firestore, COLLECTION_COMMENT), {
+            ...data,
+            timestamp: serverTimestamp(),
+        });
+    } catch (e) {
+        error = e as Error;
+    }
+
+    if (docRef) {
+        commentId = docRef.id;
+    }
+
+    return { commentId, error };
 }

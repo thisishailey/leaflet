@@ -1,22 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import getData from '@/firebase/db/getData';
-import getFile from '@/firebase/storage/getFile';
+import { useAuthContext } from '@/firebase/auth/state';
 import {
-    COLLECTION_POST,
-    COLLECTION_USER,
-    PostData,
-    UserData,
-} from '@/firebase/db/model';
-import type { Timestamp } from 'firebase/firestore';
-import { getElapsedTime } from '@/util/datetime';
+    type PostDetail,
+    type CommentDetail,
+    getPost,
+    getComments,
+} from '@/firebase/db/getData';
+import {
+    type CurrentUserPost,
+    getCurrentUserOnPost,
+} from '@/firebase/db/getData';
+import { addComment } from '@/firebase/db/addData';
+import {
+    updateBookmark,
+    updateComment,
+    updateLike,
+} from '@/firebase/db/updateData';
 import { emptyValue } from '@/util/util';
 
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
+import Fade from '@mui/material/Fade';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -28,114 +40,144 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SendIcon from '@mui/icons-material/Send';
 
 export default function Post({ params }: { params: { postId: string } }) {
-    const [loadFailed, setLoadFailed] = useState(false);
+    const { user } = useAuthContext();
+
     const [alert, setAlert] = useState<string>('');
-
-    const [username, setUsername] = useState<string>('');
-    const [profileSrc, setProfileSrc] = useState<string>('');
-    const [isLiked, setIsLiked] = useState(false);
-    const [isBookmarked, setIsBookmarked] = useState(false);
-
-    const [elapsedTime, setElapsedTime] = useState<string>('');
-    const [content, setContent] = useState<string>('');
-    const [images, setImages] = useState<string[]>([]);
-    const [comments, setComments] = useState<string[]>([]);
-    const [likes, setLikes] = useState<number>(0);
-
-    const [currentUserName, setCurrentUserName] = useState<string>('');
-    const [currentUserProfile, setCurrentUserProfile] = useState<string>('');
+    const [currentUser, setCurrentUser] = useState<CurrentUserPost>();
+    const [isLiked, setIsLiked] = useState<boolean>(false);
+    const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+    const [post, setPost] = useState<PostDetail>();
+    const [likesCount, setLikesCount] = useState<number>(0);
+    const [comments, setComments] = useState<CommentDetail[]>([]);
 
     useEffect(() => {
-        const loadPost = async () => {
-            const { result, error } = await getData(
-                COLLECTION_POST,
+        if (!user) {
+            return;
+        }
+
+        const getCurrentUser = async () => {
+            const { currentUser, error } = await getCurrentUserOnPost(
+                user.email as string,
                 params.postId
             );
 
             if (error) {
-                setLoadFailed(true);
+                return setAlert('회원 정보를 불러오지 못했습니다.');
             }
-            setLoadFailed(false);
 
-            const postData = result as PostData;
+            setAlert('');
+            setCurrentUser(currentUser as CurrentUserPost);
+            setIsLiked(currentUser?.like || false);
+            setIsBookmarked(currentUser?.bookmark || false);
+        };
 
-            const content = postData.content;
-            setContent(content);
-            const timestamp = postData.timestamp as Timestamp;
-            const elapsedTime = getElapsedTime(timestamp.toDate());
-            setElapsedTime(elapsedTime);
-            const likes = postData.likes || 0;
-            setLikes(likes);
-            const comments = postData.comments || [];
-            setComments(comments);
+        getCurrentUser();
+    }, [params.postId, user]);
 
-            let imageUrl: string;
-            const getUsername = async () => {
-                const { result, error } = await getData(
-                    COLLECTION_USER,
-                    postData.email
-                );
+    useEffect(() => {
+        const loadPost = async () => {
+            const { post, error } = await getPost(params.postId);
 
-                if (error) {
-                    return setAlert('아이디를 불러오지 못했습니다.');
-                }
-
-                const userData = result as UserData;
-                setUsername(userData.username);
-                imageUrl = userData.profileImg as string;
-            };
-            await getUsername();
-
-            const getProfileImage = async () => {
-                const { result } = await getFile(imageUrl);
-                if (result) {
-                    setProfileSrc(result);
-                }
-            };
-            await getProfileImage();
-
-            const images = postData.images;
-            if (images) {
-                const imageUrl: string[] = [];
-
-                for (const image of images) {
-                    const { result, error } = await getFile(image);
-                    if (error) {
-                        continue;
-                    }
-                    imageUrl.push(result as string);
-                }
-
-                setImages(imageUrl);
+            if (error) {
+                return setAlert('게시글을 불러오지 못했습니다.');
             }
+
+            setAlert('');
+            setPost(post as PostDetail);
+            setLikesCount(post?.likes || 0);
+            setComments(post?.comments || []);
         };
 
         loadPost();
     }, [params.postId]);
 
-    const handleLike = () => {
+    const handleLike = async () => {
+        const { error } = await updateLike(
+            currentUser?.email as string,
+            params.postId as string,
+            isLiked
+        );
+
+        if (error) {
+            return setAlert(error.message);
+        }
+
+        if (isLiked) {
+            setLikesCount((likes) => likes - 1);
+        } else {
+            setLikesCount((likes) => likes + 1);
+        }
         setIsLiked(!isLiked);
     };
 
-    const handleBookmark = () => {
+    const handleBookmark = async () => {
+        const { error } = await updateBookmark(
+            currentUser?.email as string,
+            params.postId as string,
+            isBookmarked
+        );
+
+        if (error) {
+            return setAlert(error.message);
+        }
+
         setIsBookmarked(!isBookmarked);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const comment = data.get('new-comment');
+        const comment = data.get('new-comment') as string;
+
+        const { commentId } = await addComment({
+            content: comment,
+            email: currentUser?.email as string,
+        });
+
+        if (!commentId) {
+            return setAlert('댓글을 작성하지 못했습니다.');
+        }
+
+        const { error } = await updateComment(params.postId, commentId);
+
+        if (error) {
+            return setAlert(error.message);
+        }
+
+        const newComment = await getComments([commentId]);
 
         emptyValue('#new-comment');
+        setComments(comments.concat(newComment));
     };
 
     return (
         <>
             <style>{`footer {display: none;} #bottom-action-buttons {display: none;}`}</style>
+            <Fade
+                in={alert !== ''}
+                addEndListener={() =>
+                    setTimeout(() => {
+                        setAlert('');
+                    }, 4000)
+                }
+            >
+                <Alert
+                    severity={'error'}
+                    sx={{
+                        width: '100%',
+                        maxWidth: 900,
+                        borderRadius: 2,
+                        display: alert ? 'flex' : 'none',
+                    }}
+                >
+                    {alert}
+                </Alert>
+            </Fade>
             <Paper
                 variant="outlined"
                 sx={{ minHeight: 200, px: 2, py: 1.5, borderRadius: 4 }}
@@ -151,11 +193,11 @@ export default function Post({ params }: { params: { postId: string } }) {
                         alignItems={{ xs: 'center', md: 'flex-start' }}
                     >
                         <Avatar
-                            src={profileSrc}
-                            alt={username}
+                            src={post?.profileSrc}
+                            alt={post?.username}
                             sx={{ width: 28, height: 28 }}
                         >
-                            {username}
+                            {post?.username}
                         </Avatar>
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}
@@ -163,10 +205,10 @@ export default function Post({ params }: { params: { postId: string } }) {
                             alignItems={'baseline'}
                         >
                             <Typography fontSize={18} fontWeight={600}>
-                                {username}
+                                {post?.username}
                             </Typography>
                             <Typography fontSize={14} color={'primary.main'}>
-                                {elapsedTime}
+                                {post?.elapsedTime}
                             </Typography>
                         </Stack>
                     </Stack>
@@ -200,10 +242,14 @@ export default function Post({ params }: { params: { postId: string } }) {
                 </Stack>
                 <Divider aria-hidden="true" sx={{ py: 0.5 }} />
                 <Box px={{ xs: 0, md: 2 }} py={{ xs: 2, md: 3 }}>
-                    <div dangerouslySetInnerHTML={{ __html: content }}></div>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: post?.content || '',
+                        }}
+                    ></div>
                 </Box>
                 <Grid container gap={2} m={1}>
-                    {images.map((image) => (
+                    {post?.images.map((image) => (
                         <Avatar
                             key={image}
                             src={image}
@@ -225,6 +271,8 @@ export default function Post({ params }: { params: { postId: string } }) {
                 <Stack
                     direction={'row'}
                     spacing={2}
+                    mb={2}
+                    px={1}
                     divider={
                         <Divider
                             orientation="vertical"
@@ -233,10 +281,60 @@ export default function Post({ params }: { params: { postId: string } }) {
                         />
                     }
                 >
-                    <Typography>{`댓글 ${comments.length}개`}</Typography>
-                    <Typography>{`좋아요 ${likes}개`}</Typography>
+                    <Typography
+                        fontSize={14}
+                    >{`댓글 ${comments.length}개`}</Typography>
+                    <Typography
+                        fontSize={14}
+                    >{`좋아요 ${likesCount}개`}</Typography>
                 </Stack>
+                {comments.map((comment, i) => (
+                    <Card
+                        key={i}
+                        elevation={0}
+                        sx={{
+                            width: '100%',
+                        }}
+                    >
+                        <Divider aria-hidden="true" />
+                        <CardHeader
+                            avatar={
+                                <Avatar
+                                    src={comment.profileSrc}
+                                    sx={{ width: 24, height: 24 }}
+                                >
+                                    {comment.username}
+                                </Avatar>
+                            }
+                            action={
+                                <IconButton>
+                                    <MoreHorizIcon />
+                                </IconButton>
+                            }
+                            title={comment.username}
+                            subheader={comment.elapsedTime}
+                            titleTypographyProps={{
+                                sx: {
+                                    display: 'inline',
+                                    fontWeight: 500,
+                                    fontSize: 16,
+                                },
+                            }}
+                            subheaderTypographyProps={{
+                                sx: { display: 'inline', ml: 2 },
+                            }}
+                        />
+                        <CardContent sx={{ pt: 0 }}>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: comment.content,
+                                }}
+                            ></div>
+                        </CardContent>
+                    </Card>
+                ))}
             </Paper>
+            <Box height={200} />
             <Box
                 sx={{
                     position: 'fixed',
@@ -277,8 +375,8 @@ export default function Post({ params }: { params: { postId: string } }) {
                         alignItems={'center'}
                         justifyContent={'space-between'}
                     >
-                        <Avatar src={currentUserProfile}>
-                            {currentUserName}
+                        <Avatar src={currentUser?.profileSrc}>
+                            {currentUser?.username}
                         </Avatar>
                         <Button
                             type="submit"
