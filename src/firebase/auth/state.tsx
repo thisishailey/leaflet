@@ -4,7 +4,9 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../config';
 import { User, onAuthStateChanged } from 'firebase/auth';
 
-const AuthContext = createContext<{ user: User | null }>({ user: null });
+type UserState = User | 'none' | 'loading';
+
+const AuthContext = createContext<{ user: UserState }>({ user: 'loading' });
 export const useAuthContext = () => useContext(AuthContext);
 
 export default function AuthContextProvider({
@@ -12,12 +14,12 @@ export default function AuthContextProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserState>('loading');
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+            setUser(user || 'none');
             setLoading(false);
         });
 

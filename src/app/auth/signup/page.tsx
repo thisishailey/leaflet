@@ -6,6 +6,7 @@ import authSignUp from '@/firebase/auth/signup';
 import addData from '@/firebase/db/addData';
 import updateData from '@/firebase/db/updateData';
 import uploadFile from '@/firebase/storage/uploadFile';
+import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { COLLECTION_USER, type UserDataUpdate } from '@/firebase/db/model';
 
 import { CopyrightShort } from '@/components/common/copyright';
@@ -126,7 +127,7 @@ export default function SignUp() {
 
         let newData: UserDataUpdate = {};
         if (image) {
-            const { error, imageUrl } = await uploadFile('userProfile', image);
+            const { error, imageUrl } = await uploadFile(PROFILE_IMAGE, image);
 
             if (error) {
                 return setAlert(error.message);

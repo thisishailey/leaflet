@@ -1,88 +1,69 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { User } from 'firebase/auth';
+import Link from 'next/link';
 import { useAuthContext } from '@/firebase/auth/state';
-import getData from '@/firebase/db/getData';
+import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
 import addData from '@/firebase/db/addData';
-import {
-    COLLECTION_POST,
-    COLLECTION_USER,
-    Data,
-    UserData,
-} from '@/firebase/db/model';
 import uploadFile from '@/firebase/storage/uploadFile';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
+import { type PostData, COLLECTION_POST } from '@/firebase/db/model';
+import { POST_IMAGES } from '@/firebase/storage/directory';
+
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import ToggleButton from '@mui/material/ToggleButton';
+import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
 import Fade from '@mui/material/Fade';
-import Backdrop from '@mui/material/Backdrop';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
-import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatClearIcon from '@mui/icons-material/FormatClear';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
 import UndoIcon from '@mui/icons-material/Undo';
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
 
 import { useEditor, EditorContent, BubbleMenu, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
-import getFile from '@/firebase/storage/getFile';
-import Link from 'next/link';
 
 export const WritePost = () => {
     const CHAR_LIMIT = 500;
     const { user } = useAuthContext();
-    const [open, setOpen] = useState(false);
-    const [isNotUser, setIsNotUser] = useState(false);
+
     const [alert, setAlert] = useState<string>('');
+    const [open, setOpen] = useState(false);
     const [complete, setComplete] = useState<string>('');
-    const [username, setUsername] = useState<string>('');
-    const [profileSrc, setProfileSrc] = useState<string>('');
+
+    const [userData, setUserData] = useState<UserBasic>();
     const [clickedImage, setClickedImage] = useState<string>('');
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string[]>([]);
     const [uploadedImage, setUploadedImage] = useState<File[]>([]);
 
     useEffect(() => {
+        if (!user || user === 'none' || user === 'loading') {
+            return;
+        }
+
         const loadProfile = async () => {
-            if (!user) {
-                return setIsNotUser(true);
-            }
-            setIsNotUser(false);
+            const result = await getUserProfile(user.email as string);
 
-            const { result, error } = await getData(
-                COLLECTION_USER,
-                (user as User).email as string
-            );
-
-            if (error) {
+            if (result.error) {
                 return setAlert('프로필 사진을 불러오지 못했습니다.');
             }
 
-            const userData = result as UserData;
-            const imageUrl = userData.profileImg;
-            const username = userData.username;
-
-            if (imageUrl) {
-                const { result, error } = await getFile(imageUrl);
-                if (error) {
-                    return setAlert('프로필 사진을 불러오지 못했습니다.');
-                }
-                setProfileSrc(result as string);
-            }
-
-            setUsername(username);
+            const userData = result.user as UserBasic;
+            setUserData(userData);
         };
+
         loadProfile();
     }, [user]);
 
@@ -159,18 +140,18 @@ export const WritePost = () => {
     };
 
     const handleSubmit = async () => {
-        if (editor.isEmpty) {
+        if (editor.isEmpty && uploadedImage.length === 0) {
             return setAlert('내용을 입력해 주세요.');
         }
 
-        const email = (user as User).email as string;
+        const email = userData?.email as string;
         const content = editor.getHTML();
 
         const images: string[] = [];
         if (uploadedImage) {
             for (let i = 0; i < uploadedImage.length; i++) {
                 const { error, imageUrl } = await uploadFile(
-                    'post',
+                    POST_IMAGES,
                     uploadedImage[i]
                 );
 
@@ -178,11 +159,12 @@ export const WritePost = () => {
                     setAlert(error.message);
                     continue;
                 }
+
                 images.push(imageUrl);
             }
         }
 
-        let data: Data = { content, email };
+        let data: PostData = { content, email };
         if (images) {
             data = { ...data, images };
         }
@@ -202,7 +184,7 @@ export const WritePost = () => {
 
     return (
         <>
-            {user && (
+            {user && user !== 'none' && user !== 'loading' && (
                 <>
                     <Backdrop
                         open={open}
@@ -389,12 +371,12 @@ export const WritePost = () => {
                                 justifyContent={'space-between'}
                             >
                                 <Avatar
-                                    src={profileSrc}
+                                    src={userData?.profileSrc}
                                     sx={{
                                         display: { xs: 'none', sm: 'flex' },
                                     }}
                                 >
-                                    {username}
+                                    {userData?.username}
                                 </Avatar>
                                 <Button
                                     variant="contained"
@@ -429,7 +411,7 @@ export const WritePost = () => {
                     </Fade>
                 </>
             )}
-            {isNotUser && (
+            {user && user === 'none' && (
                 <Paper
                     variant="outlined"
                     sx={{

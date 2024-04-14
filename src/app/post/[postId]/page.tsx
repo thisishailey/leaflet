@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuthContext } from '@/firebase/auth/state';
 import {
     type PostDetail,
@@ -46,17 +47,18 @@ import SendIcon from '@mui/icons-material/Send';
 
 export default function Post({ params }: { params: { postId: string } }) {
     const { user } = useAuthContext();
+    const [alert, setAlert] = useState<React.ReactNode>('');
 
-    const [alert, setAlert] = useState<string>('');
     const [currentUser, setCurrentUser] = useState<CurrentUserPost>();
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+
     const [post, setPost] = useState<PostDetail>();
     const [likesCount, setLikesCount] = useState<number>(0);
     const [comments, setComments] = useState<CommentDetail[]>([]);
 
     useEffect(() => {
-        if (!user) {
+        if (!user || user === 'none' || user === 'loading') {
             return;
         }
 
@@ -96,9 +98,29 @@ export default function Post({ params }: { params: { postId: string } }) {
         loadPost();
     }, [params.postId]);
 
+    const needSignIn = (
+        <>
+            {'로그인이 필요합니다.'}
+            <Link href={'/auth/signin'}>
+                <Typography
+                    fontSize={13}
+                    fontWeight={500}
+                    component={'span'}
+                    ml={5}
+                >
+                    {'로그인하러 가기'}
+                </Typography>
+            </Link>
+        </>
+    );
+
     const handleLike = async () => {
+        if (!currentUser) {
+            return setAlert(needSignIn);
+        }
+
         const { error } = await updateLike(
-            currentUser?.email as string,
+            currentUser.email,
             params.postId as string,
             isLiked
         );
@@ -116,6 +138,10 @@ export default function Post({ params }: { params: { postId: string } }) {
     };
 
     const handleBookmark = async () => {
+        if (!currentUser) {
+            return setAlert(needSignIn);
+        }
+
         const { error } = await updateBookmark(
             currentUser?.email as string,
             params.postId as string,
@@ -131,12 +157,16 @@ export default function Post({ params }: { params: { postId: string } }) {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (!currentUser) {
+            return setAlert(needSignIn);
+        }
+
         const data = new FormData(event.currentTarget);
         const comment = data.get('new-comment') as string;
 
         const { commentId } = await addComment({
             content: comment,
-            email: currentUser?.email as string,
+            email: currentUser.email,
         });
 
         if (!commentId) {
@@ -163,14 +193,15 @@ export default function Post({ params }: { params: { postId: string } }) {
                 addEndListener={() =>
                     setTimeout(() => {
                         setAlert('');
-                    }, 4000)
+                    }, 400000)
                 }
             >
                 <Alert
                     severity={'error'}
                     sx={{
                         width: '100%',
-                        maxWidth: 900,
+                        maxWidth: 976,
+                        mb: 2,
                         borderRadius: 2,
                         display: alert ? 'flex' : 'none',
                     }}
@@ -366,7 +397,12 @@ export default function Post({ params }: { params: { postId: string } }) {
                         rows={4}
                         id="new-comment"
                         name="new-comment"
-                        placeholder="댓글을 작성해 주세요."
+                        disabled={Boolean(!currentUser)}
+                        placeholder={
+                            currentUser
+                                ? '댓글을 작성해 주세요.'
+                                : '로그인 후 댓글을 작성해 주세요.'
+                        }
                         InputProps={{ sx: { borderRadius: 3 } }}
                     />
                     <Stack
