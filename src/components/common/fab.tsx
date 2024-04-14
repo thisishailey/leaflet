@@ -1,24 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import Container from '@mui/material/Container';
+import { scrollToTop } from '@/util/common';
+import { ModeSwitcher } from '@/styles/theme';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Fab from '@mui/material/Fab';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
-import { ModeSwitcher } from '@/styles/theme';
-import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
 import SettingsIcon from '@mui/icons-material/Settings';
+import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
 
 export default function BottomActionButtons() {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-    const handleBackToTop = () => {
-        const anchor = document.querySelector('#back-to-top-anchor');
-        if (anchor) {
-            anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    };
 
     const handleOpenSetting = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -41,7 +35,7 @@ export default function BottomActionButtons() {
             >
                 <Fab
                     aria-label="scroll back to top"
-                    onClick={handleBackToTop}
+                    onClick={scrollToTop}
                     color="secondary"
                     size="small"
                     sx={{

@@ -19,7 +19,7 @@ import {
     updateComment,
     updateLike,
 } from '@/firebase/db/updateData';
-import { emptyValue } from '@/util/util';
+import { emptyValue } from '@/util/common';
 
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';

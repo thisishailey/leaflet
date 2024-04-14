@@ -1,23 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { setFocus, emptyValue, getValue } from '@/util/common';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import { setFocus, removeFocus, emptyValue, getValue } from '@/util/util';
 
 interface SearchPostValue {
     value: string;
-    hashtag: JSX.Element;
+    hashtag: React.ReactNode;
 }
 
-export const SearchPost = () => {
+interface Props {
+    handleSearch: (search: string[]) => void;
+}
+
+export default function SearchPost({ handleSearch }: Props) {
     const [searchValue, setSearchValue] = useState<SearchPostValue[]>([]);
     const [isError, setIsError] = useState<boolean>(false);
     const [isMax, setIsMax] = useState<boolean>(false);
-    const [submitted, setSubmitted] = useState<boolean>(false);
 
     const placeholderText = '읽고 싶은 키워드를 검색해 보세요.';
     const errorHelperText = '검색할 키워드를 1개 이상 입력해 주세요.';
@@ -29,12 +34,7 @@ export const SearchPost = () => {
         } else {
             setIsMax(false);
         }
-
-        if (submitted) {
-            console.log(searchValue.map((search) => search.value));
-            setSubmitted(false);
-        }
-    }, [searchValue, submitted]);
+    }, [searchValue]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsError(false);
@@ -43,17 +43,33 @@ export const SearchPost = () => {
         const isSpace = input.endsWith(' ');
 
         if (isSpace) {
-            handleNewValue(input.trim());
+            handleAddValue(input.trim());
         }
     };
 
     const handleKeydown = (event: React.KeyboardEvent) => {
         if (event.key === 'Backspace' && getValue('#search-post') === '') {
-            setSearchValue(searchValue.slice(0, -1));
+            handleRemoveValue(searchValue[searchValue.length - 1].value);
         }
     };
 
-    const handleNewValue = (value: string) => {
+    const handleRemoveValue = (value: string) => {
+        let values: SearchPostValue[];
+        setSearchValue((searchValue) => {
+            values = searchValue.filter((search) => search.value !== value);
+            return values;
+        });
+
+        handleSubmit(values!.map((value) => value.value));
+    };
+
+    const handleEmptyValue = () => {
+        setSearchValue([]);
+
+        handleSubmit([]);
+    };
+
+    const handleAddValue = (value: string) => {
         emptyValue('#search-post');
 
         if (searchValue.find((search) => search.value === value) || isMax) {
@@ -68,43 +84,38 @@ export const SearchPost = () => {
                 label={'# ' + value}
                 sx={{ mr: 1, fontWeight: 600 }}
                 clickable
-                onClick={() => {
-                    setSearchValue((searchValue) => {
-                        return searchValue.filter(
-                            (search) => search.value !== value
-                        );
-                    });
-                    setFocus('#search-post');
-                }}
+                onClick={() => handleRemoveValue(value)}
             />
         );
 
         const newValue: SearchPostValue = { value, hashtag };
-        setSearchValue(searchValue.concat(newValue));
+        const values = searchValue.concat(newValue);
+        setSearchValue(values);
+
+        handleSubmit(values.map((value) => value.value));
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         const data = new FormData(event.currentTarget);
+
         const input = data.get('search-post') as string;
         if (input) {
-            handleNewValue(input.trim());
+            return handleAddValue(input.trim());
         }
 
-        if (searchValue.length === 0 && !input) {
-            setIsError(true);
-            return setFocus('#search-post');
-        }
+        handleSubmit(searchValue.map((value) => value.value));
+    };
 
-        removeFocus('#search-post');
-        return setSubmitted(true);
+    const handleSubmit = (values: string[]) => {
+        setFocus('#search-post');
+        handleSearch(values);
     };
 
     return (
         <Box
             component={'form'}
-            onSubmit={handleSubmit}
+            onSubmit={handleFormSubmit}
             width={'100%'}
             maxWidth={500}
         >
@@ -116,11 +127,22 @@ export const SearchPost = () => {
                 InputProps={{
                     sx: {
                         borderRadius: 7,
-                        px: 3,
+                        pl: 3,
                     },
                     endAdornment: (
                         <InputAdornment position="end">
-                            <SearchIcon />
+                            {searchValue.length > 0 && (
+                                <IconButton
+                                    size="small"
+                                    color="primary"
+                                    onClick={handleEmptyValue}
+                                >
+                                    <CloseRoundedIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                            <IconButton type="submit">
+                                <SearchIcon />
+                            </IconButton>
                         </InputAdornment>
                     ),
                     startAdornment: (
@@ -137,4 +159,4 @@ export const SearchPost = () => {
             />
         </Box>
     );
-};
+}

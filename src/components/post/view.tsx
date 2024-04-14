@@ -3,30 +3,29 @@
 import { useEffect, useState } from 'react';
 import { firestore } from '@/firebase/config';
 import { collection as col, getDocs } from 'firebase/firestore';
-import {
-    COLLECTION_POST,
-    COLLECTION_USER,
-    PostData,
-    UserData,
-} from '@/firebase/db/model';
-import getData from '@/firebase/db/getData';
-import getFile from '@/firebase/storage/getFile';
+import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
+import { type PostData, COLLECTION_POST } from '@/firebase/db/model';
 import { PostPreview } from './post';
-import { Paper, Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
-interface Posts {
-    data: PostData;
+interface Post {
     id: string;
-    username: string;
-    profileSrc: string;
+    data: PostData;
+    writer: UserBasic;
+    match?: number;
 }
 
-export default function ViewPost() {
-    const [posts, setPosts] = useState<Posts[]>([]);
+export default function ViewPost({ search }: { search: string[] }) {
+    const [postsAll, setPostsAll] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]);
     const [noPost, setNoPost] = useState(false);
+    const [noSearchResult, setNoSearchResult] = useState(false);
+    const noPostText = '리프가 없습니다.';
+    const noSearchResultText = '검색 결과가 없습니다.';
 
     useEffect(() => {
-        const loadedPosts: Posts[] = [];
+        const loadedPosts: Post[] = [];
+
         const loadPost = async () => {
             const querySnapshot = await getDocs(
                 col(firestore, COLLECTION_POST)
@@ -40,62 +39,77 @@ export default function ViewPost() {
 
             for (const doc of querySnapshot.docs) {
                 const postData = doc.data() as PostData;
-                const { result, error } = await getData(
-                    COLLECTION_USER,
-                    postData.email
-                );
+                const { user, error } = await getUserProfile(postData.email);
 
                 if (error) {
                     return;
                 }
 
-                const userData = result as UserData;
-                const imageUrl = userData.profileImg;
-
-                let profileSrc = '';
-                if (imageUrl) {
-                    const { result } = await getFile(imageUrl);
-                    if (result) {
-                        profileSrc = result;
-                    }
-                }
-
                 const newPost = {
-                    data: postData,
                     id: doc.id,
-                    username: userData.username,
-                    profileSrc: profileSrc,
+                    data: postData,
+                    writer: user as UserBasic,
                 };
 
                 loadedPosts.push(newPost);
             }
 
-            setPosts(loadedPosts);
+            setPostsAll(loadedPosts);
         };
+
         loadPost();
     }, []);
+
+    useEffect(() => {
+        const handleSearch = () => {
+            if (search.length === 0) {
+                return setPosts(postsAll);
+            }
+
+            const filteredPosts: Post[] = [];
+
+            for (let i = 0; i < postsAll.length; i++) {
+                const content = postsAll[i].data.content;
+                let match = 0;
+
+                for (const item of search) {
+                    if (content.includes(item)) {
+                        match++;
+                    }
+                }
+
+                if (match > 0) {
+                    filteredPosts.push({ ...postsAll[i], match });
+                }
+            }
+
+            filteredPosts.sort((a, b) => b.match! - a.match!);
+            setPosts(filteredPosts);
+
+            if (filteredPosts.length === 0) {
+                setNoSearchResult(true);
+            } else {
+                setNoSearchResult(false);
+            }
+        };
+
+        handleSearch();
+    }, [postsAll, search]);
 
     return (
         <>
             {posts &&
                 posts.map((post) => (
                     <PostPreview
-                        username={post.username}
-                        content={post.data.content}
-                        profileSrc={post.profileSrc}
-						id={post.id}
                         key={post.id}
+                        id={post.id}
+                        username={post.writer.username}
+                        profileSrc={post.writer.profileSrc}
+                        content={post.data.content}
                     />
                 ))}
-            {noPost && (
-                <Paper>
-                    <Typography>
-                        {
-                            '리프가 없습니다. 일시적인 오류일 수 있으니, 페이지를 새로 고침하거나 인터넷에 연결 후 다시 시도해 주세요.'
-                        }
-                    </Typography>
-                </Paper>
-            )}
+            {noPost && <Typography>{noPostText}</Typography>}
+            {noSearchResult && <Typography>{noSearchResultText}</Typography>}
         </>
     );
 }

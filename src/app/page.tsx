@@ -1,14 +1,59 @@
-import Stack from '@mui/material/Stack';
-import { SearchPost } from '@/components/common/search';
-import { WritePost } from '@/components/post/write';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { scrollToTop } from '@/util/common';
+import SearchPost from '@/components/post/search';
+import WritePost from '@/components/post/write';
 import ViewPost from '@/components/post/view';
+import Fab from '@mui/material/Fab';
+import Stack from '@mui/material/Stack';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 export default function Home() {
+    const [search, setSearch] = useState<string[]>([]);
+    const [onSearch, setOnSearch] = useState<boolean>(false);
+    const [writePost, setWritePost] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (search.length === 0) {
+            setWritePost(true);
+            setOnSearch(false);
+        } else {
+            setWritePost(false);
+            setOnSearch(true);
+        }
+    }, [search]);
+
+    const handleSearch = (search: string[]) => {
+        setSearch(search);
+    };
+
     return (
-        <Stack direction={'column'} alignItems={'center'} spacing={1}>
-            <SearchPost />
-            <WritePost />
-            <ViewPost />
-        </Stack>
+        <>
+            <Stack direction={'column'} alignItems={'center'} spacing={1}>
+                <SearchPost handleSearch={handleSearch} />
+                {writePost && <WritePost />}
+                <ViewPost search={search} />
+            </Stack>
+            <Fab
+                color="primary"
+                sx={{ position: 'fixed', bottom: 30, left: 30 }}
+                onClick={() => {
+                    if (onSearch && writePost) {
+                        setWritePost(false);
+                    } else {
+                        setWritePost(true);
+                        scrollToTop();
+                    }
+                }}
+            >
+                {onSearch && writePost ? (
+                    <CloseRoundedIcon />
+                ) : (
+                    <DriveFileRenameOutlineIcon />
+                )}
+            </Fab>
+        </>
     );
 }

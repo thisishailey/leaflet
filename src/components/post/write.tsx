@@ -35,7 +35,7 @@ import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 
-export const WritePost = () => {
+export default function WritePost() {
     const CHAR_LIMIT = 500;
     const { user } = useAuthContext();
 
@@ -448,4 +448,4 @@ export const WritePost = () => {
             )}
         </>
     );
-};
+}
