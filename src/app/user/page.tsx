@@ -10,7 +10,9 @@ export default function Profile() {
     return (
         <div>
             <AuthButtons />
-            {user?.email && <UserProfile id={user.email} />}
+            {typeof user !== 'string' && (
+                <UserProfile id={user.email as string} />
+            )}
         </div>
     );
 }
