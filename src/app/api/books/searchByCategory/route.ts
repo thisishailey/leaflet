@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BookSearchItemData } from '../type';
 
 const ENDPOINT = 'http://www.aladin.co.kr/ttb/api/ItemList.aspx';
 
-type SearchCategory =
-    | 'ItemNewAll'
+export type SearchCategory =
     | 'ItemNewSpecial'
-    | 'ItemEditorChoice'
-    | 'Bestseller';
+    | 'ItemNewAll'
+    | 'Bestseller'
+    | 'BlogBest';
 
 export async function GET(req: NextRequest) {
     const params = new URLSearchParams({
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
         body: params,
         method: 'post',
     });
-    const data = await res.json();
+    const data: BookSearchItemData = await res.json();
 
-    return NextResponse.json({ data });
+    return NextResponse.json(data);
 }
