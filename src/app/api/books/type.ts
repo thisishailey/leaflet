@@ -33,19 +33,35 @@ export interface BookItemData {
     pubDate: string;
     publisher: string;
     salesPoint: number;
-    seriesInfo: { seriesId: number; seriesLink: string; seriesName: string };
+    seriesInfo?: { seriesId: number; seriesLink: string; seriesName: string };
     stockStatus: string;
-    subInfo: Object;
+    subInfo?: {
+        bestSellerRank: string;
+        itemPage: number;
+        originalTitle: string;
+        ratingInfo: {
+            commentReviewCount: number;
+            myReviewCount: number;
+            ratingCount: number;
+            ratingScore: number;
+        };
+        subTitle: string;
+    };
     title: string;
 }
 
 export interface BookItem {
+    isbn13: string;
+    cover: string;
     title: string;
     author: string;
     publisher: string;
     pubDate: string;
     categoryName: string;
     description: string;
-    cover: string;
-    isbn13: string;
+    customerReviewRank: number;
+    subInfo?: {
+        bestSellerRank: string;
+        itemPage: number;
+    };
 }
