@@ -64,4 +64,5 @@ export interface BookItem {
         bestSellerRank: string;
         itemPage: number;
     };
+    link: string;
 }

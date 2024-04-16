@@ -19,7 +19,7 @@ import {
     updateComment,
     updateLike,
 } from '@/firebase/db/updateData';
-import { emptyValue } from '@/util/common';
+import { emptyValue, scrollToTop } from '@/util/common';
 
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
@@ -56,6 +56,8 @@ export default function Post({ params }: { params: { postId: string } }) {
     const [post, setPost] = useState<PostDetail>();
     const [likesCount, setLikesCount] = useState<number>(0);
     const [comments, setComments] = useState<CommentDetail[]>([]);
+
+    useEffect(() => scrollToTop(), []);
 
     useEffect(() => {
         if (!user || user === 'none' || user === 'loading') {

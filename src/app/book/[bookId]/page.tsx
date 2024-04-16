@@ -1,18 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Rating from '@mui/material/Rating';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Divider, Stack } from '@mui/material';
 import Image from 'next/image';
+import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
+import { scrollToTop } from '@/util/common';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Divider from '@mui/material/Divider';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { useRouter } from 'next/navigation';
+import { Avatar, Button, Paper, TextField } from '@mui/material';
 
 export default function BookDetail({ params }: { params: { bookId: string } }) {
+    const { push } = useRouter();
     const [book, setBook] = useState<BookItem>();
+    const [rating, setRating] = useState<number | null>(3);
+
+    useEffect(() => scrollToTop(), []);
 
     useEffect(() => {
         const loadBook = async () => {
@@ -38,7 +46,6 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                         width: '100%',
                         maxWidth: 976,
                         height: '100%',
-                        // minHeight: 500,
                         p: 2,
                     }}
                 >
@@ -68,18 +75,32 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                             {book.title}
                         </Typography>
                         <Stack
+                            width={'100%'}
+                            maxWidth={944}
                             direction={{ xs: 'column', md: 'row' }}
-                            spacing={{ xs: 0, md: 2 }}
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            spacing={{ xs: 0.5, md: 2 }}
                             divider={
                                 <Divider orientation="vertical" flexItem />
                             }
                         >
-                            <Typography>{book.author}</Typography>
-                            <Typography>{book.publisher}</Typography>
-                            <Typography>{book.pubDate}</Typography>
-                            {book.subInfo && (
-                                <Typography>{`${book.subInfo.itemPage} 페이지`}</Typography>
-                            )}
+                            <Typography noWrap maxWidth={300}>
+                                {book.author}
+                            </Typography>
+                            <Stack
+                                direction={'row'}
+                                spacing={2}
+                                divider={
+                                    <Divider orientation="vertical" flexItem />
+                                }
+                            >
+                                <Typography>{book.publisher}</Typography>
+                                <Typography>{book.pubDate}</Typography>
+                                {book.subInfo && (
+                                    <Typography>{`${book.subInfo.itemPage} 페이지`}</Typography>
+                                )}
+                            </Stack>
                         </Stack>
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}
@@ -91,40 +112,139 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                                 width={200}
                                 height={400}
                                 flexShrink={0}
+                                sx={{ cursor: 'pointer' }}
+                                onClick={() => push(book.link)}
                             >
                                 <Image
-                                    src={book.cover}
-                                    alt={book.title}
                                     priority
                                     fill
-                                    objectFit="contain"
+                                    src={book.cover}
+                                    alt={book.title}
                                     quality={100}
+                                    style={{ objectFit: 'contain' }}
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 />
                             </Box>
                             <Stack
                                 direction={'column'}
                                 justifyContent={'center'}
-                                spacing={2}
+                                spacing={1}
                             >
                                 {book.subInfo && (
-                                    <Typography fontWeight={600}>
+                                    <Typography
+                                        fontWeight={600}
+                                        color={'text.secondary'}
+                                    >
                                         {book.subInfo.bestSellerRank}
                                     </Typography>
                                 )}
-                                <Box display={'flex'} gap={1}>
-                                    <Rating
-                                        defaultValue={
-                                            book.customerReviewRank / 2
-                                        }
-                                        precision={0.5}
-                                        readOnly
-                                    />
-                                    <Typography>
-                                        {`${book.customerReviewRank}점`}
-                                    </Typography>
-                                </Box>
+                                <Tooltip
+                                    title={'알라딘 평점'}
+                                    placement="right"
+                                    arrow
+                                >
+                                    <Box
+                                        display={'flex'}
+                                        gap={1}
+                                        width={'max-content'}
+                                    >
+                                        <Rating
+                                            defaultValue={
+                                                book.customerReviewRank / 2
+                                            }
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                        <Typography>{`${book.customerReviewRank}점`}</Typography>
+                                    </Box>
+                                </Tooltip>
+                                <Typography
+                                    pt={3}
+                                    fontSize={18}
+                                    fontWeight={500}
+                                >
+                                    {'요약'}
+                                </Typography>
                                 <Typography>{book.description}</Typography>
                             </Stack>
+                        </Stack>
+                        <Divider orientation="horizontal" flexItem />
+                        <Stack
+                            width={'100%'}
+                            maxWidth={944}
+                            pt={2}
+                            direction={'column'}
+                            alignItems={'center'}
+                            spacing={4}
+                        >
+                            <Typography
+                                component={'h4'}
+                                fontSize={22}
+                                fontWeight={500}
+                            >
+                                {'리플렛 평점 및 리뷰'}
+                            </Typography>
+                            <Stack
+                                width={'100%'}
+                                maxWidth={944}
+                                direction={{ xs: 'column', md: 'row' }}
+                                justifyContent={'space-around'}
+                            >
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    gap={1}
+                                    width={'max-content'}
+                                >
+                                    <Rating
+                                        defaultValue={5}
+                                        precision={0.5}
+                                        readOnly
+                                        size="large"
+                                        sx={{ color: 'primary.light' }}
+                                    />
+                                    <Typography>{'10점'}</Typography>
+                                </Box>
+                                <Typography>{`리뷰 0개`}</Typography>
+                            </Stack>
+                            <Paper
+                                variant="outlined"
+                                sx={{
+                                    width: '100%',
+                                    p: 2,
+                                    borderRadius: 2,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 2,
+                                }}
+                            >
+                                <Box width={'100%'}>
+                                    <Rating
+                                        value={rating}
+                                        onChange={(event, newValue) => {
+                                            setRating(newValue);
+                                        }}
+                                        precision={0.5}
+                                        sx={{ color: 'primary.light' }}
+                                    />
+                                    <TextField fullWidth multiline rows={3} />
+                                </Box>
+                                <Stack
+                                    direction={'column'}
+                                    alignItems={'center'}
+                                    justifyContent={'space-between'}
+                                >
+                                    <Avatar />
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            minWidth: 90,
+                                        }}
+                                    >
+                                        {'리뷰 쓰기'}
+                                    </Button>
+                                </Stack>
+                            </Paper>
                         </Stack>
                     </Stack>
                 </Box>
