@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react';
 import { BookCard } from './book';
 import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
-import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function ViewBook({ category }: { category: string }) {
     const [books, setBooks] = useState<BookItem[]>([]);
+    const [prevTab, setPrevTab] = useState<number>(1);
+    const [nextTab, setNextTab] = useState<number>(1);
 
     useEffect(() => {
         const loadBooks = async () => {
@@ -25,12 +27,108 @@ export default function ViewBook({ category }: { category: string }) {
         };
 
         loadBooks();
+
+        const element = document.querySelector(
+            `#${category}`
+        ) as HTMLDivElement;
+        const width = element.clientWidth - 80;
+        const number = Math.floor(width / 174 / 2);
+        setNextTab(number);
     }, [category]);
 
+    const handlePrev = () => {
+        if (prevTab < 1) {
+            return;
+        }
+
+        const element = document.querySelector(
+            `#${category} [tabindex='${prevTab - 1}']`
+        ) as HTMLAnchorElement;
+        element?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+        });
+
+        setPrevTab((tab) => tab - 1);
+        setNextTab(prevTab);
+    };
+
+    const handleNext = () => {
+        if (nextTab > 9) {
+            return;
+        }
+
+        const element = document.querySelector(
+            `#${category} [tabindex='${nextTab + 1}']`
+        ) as HTMLAnchorElement;
+        element?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+        });
+
+        setNextTab((tab) => tab + 1);
+        setPrevTab(nextTab);
+    };
+
     return (
-        <Stack direction={'row'} spacing={1} width={'100%'} overflow={'auto'}>
-            {books &&
-                books.map((book) => <BookCard key={book.isbn13} book={book} />)}
-        </Stack>
+        <Box
+            width={'100%'}
+            maxWidth={976}
+            height={300}
+            display={'flex'}
+            alignItems={'center'}
+            id={category}
+        >
+            <Box
+                width={40}
+                height={300}
+                display={'flex'}
+                alignItems={'center'}
+                justifyContent={'center'}
+                bgcolor={'background.paper'}
+                borderLeft={1}
+                borderRight={1}
+                borderColor={'grey.200'}
+                color={'grey.500'}
+                onClick={handlePrev}
+            >
+                <ArrowBackIosNewIcon />
+            </Box>
+            <Stack
+                width={'100%'}
+                maxWidth={936}
+                height={300}
+                direction={'row'}
+                spacing={1}
+                overflow={'auto'}
+                bgcolor={'background.paper'}
+                sx={{
+                    scrollBehavior: 'smooth',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgb(88, 143, 121) transparent',
+                }}
+            >
+                {books.map((book, i) => (
+                    <BookCard book={book} tabIndex={i} key={book.isbn13} />
+                ))}
+            </Stack>
+            <Box
+                width={40}
+                height={300}
+                display={'flex'}
+                alignItems={'center'}
+                justifyContent={'center'}
+                bgcolor={'background.paper'}
+                borderLeft={1}
+                borderRight={1}
+                borderColor={'grey.200'}
+                color={'grey.500'}
+                onClick={handleNext}
+            >
+                <ArrowForwardIosIcon />
+            </Box>
+        </Box>
     );
 }

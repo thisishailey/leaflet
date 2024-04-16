@@ -5,7 +5,13 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import type { BookItem } from '@/app/api/books/type';
 
-export function BookCard({ book }: { book: BookItem }) {
+export function BookCard({
+    book,
+    tabIndex,
+}: {
+    book: BookItem;
+    tabIndex: number;
+}) {
     return (
         <Link
             href={`/book/${book.isbn13}`}
@@ -14,6 +20,7 @@ export function BookCard({ book }: { book: BookItem }) {
                 height: '100%',
                 maxHeight: 300,
             }}
+            tabIndex={tabIndex}
         >
             <Card
                 sx={{
@@ -21,7 +28,6 @@ export function BookCard({ book }: { book: BookItem }) {
                     height: '100%',
                     maxHeight: 300,
                     p: 2,
-                    borderRadius: 1,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',

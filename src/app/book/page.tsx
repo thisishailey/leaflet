@@ -25,7 +25,7 @@ export default function Book() {
                     alignItems={'center'}
                     spacing={2}
                     width={'100%'}
-                    overflow={'auto'}
+                    maxWidth={976}
                     key={category.param}
                 >
                     <Divider orientation="horizontal" flexItem>
