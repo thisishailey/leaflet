@@ -11,7 +11,7 @@ export type SearchCategory =
 
 export async function GET(req: NextRequest) {
     const params = new URLSearchParams({
-        ttbkey: process.env.NEXT_PUBLIC_ALADIN_API_KEY as string,
+        ttbkey: process.env.ALADIN_API_KEY as string,
         QueryType: req.headers.get('category') as SearchCategory,
         SearchTarget: 'Book',
         Cover: 'Big',
