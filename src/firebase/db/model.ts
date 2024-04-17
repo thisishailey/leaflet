@@ -1,10 +1,14 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type Collection = UserCollection | PostCollection | CommentCollection;
+export type Collection =
+    | UserCollection
+    | PostCollection
+    | CommentCollection
+    | ReviewCollection;
 export type Data = UserData | PostData | CommentData;
 export type UpdatableData = UserDataUpdate | PostDataUpdate | CommentDataUpdate;
 
-// user
+// -------------------------- user -------------------------- //
 export type UserCollection = 'user';
 export const COLLECTION_USER: UserCollection = 'user';
 
@@ -36,7 +40,7 @@ export interface UserDataUpdate {
     bookmark?: string[];
 }
 
-// post
+// -------------------------- post -------------------------- //
 export type PostCollection = 'post';
 export const COLLECTION_POST: PostCollection = 'post';
 
@@ -57,7 +61,7 @@ export interface PostDataUpdate {
     likes?: number;
 }
 
-// comment
+// -------------------------- comment -------------------------- //
 export type CommentCollection = 'comment';
 export const COLLECTION_COMMENT: CommentCollection = 'comment';
 
@@ -72,5 +76,22 @@ export interface CommentDataUpdate {
     content: string;
 }
 
-// review
-// TODO make review data model
+// -------------------------- review -------------------------- //
+export type ReviewCollection = 'review';
+export const COLLECTION_REVIEW: ReviewCollection = 'review';
+
+export interface ReviewData {
+    _id?: string; // primary key, automatic, no update
+    isbn: string; // foreign key (book), no update
+    email: string; // foreign key (user), no update
+	anonymous: boolean;
+    rating: number;
+    content: string;
+    timestamp?: Timestamp; // automatic, no update
+}
+
+export interface ReviewDataUpdate {
+    anonymous: boolean;
+    rating: number;
+    content: string;
+}

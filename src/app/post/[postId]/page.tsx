@@ -21,15 +21,14 @@ import {
 } from '@/firebase/db/updateData';
 import { emptyValue, scrollToTop } from '@/util/common';
 
-import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
+import CustomAlert from '@/components/common/alert';
 import Divider from '@mui/material/Divider';
-import Fade from '@mui/material/Fade';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -190,27 +189,7 @@ export default function Post({ params }: { params: { postId: string } }) {
     return (
         <>
             <style>{`footer {display: none;} #bottom-action-buttons {display: none;}`}</style>
-            <Fade
-                in={alert !== ''}
-                addEndListener={() =>
-                    setTimeout(() => {
-                        setAlert('');
-                    }, 400000)
-                }
-            >
-                <Alert
-                    severity={'error'}
-                    sx={{
-                        width: '100%',
-                        maxWidth: 976,
-                        mb: 2,
-                        borderRadius: 2,
-                        display: alert ? 'flex' : 'none',
-                    }}
-                >
-                    {alert}
-                </Alert>
-            </Fade>
+            <CustomAlert alert={alert} setAlert={setAlert} />
             <Paper
                 variant="outlined"
                 sx={{ minHeight: 200, px: 2, py: 1.5, borderRadius: 4 }}

@@ -2,23 +2,27 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
 import { scrollToTop } from '@/util/common';
+
+import BookReviews from '@/components/book/reviews';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import CustomAlert from '@/components/common/alert';
 import Divider from '@mui/material/Divider';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { useRouter } from 'next/navigation';
-import { Avatar, Button, Paper, TextField } from '@mui/material';
+import CustomSnackbar from '@/components/common/snackbar';
 
 export default function BookDetail({ params }: { params: { bookId: string } }) {
     const { push } = useRouter();
+    const [alert, setAlert] = useState<string>('');
+    const [snackbar, setSnackbar] = useState<string>('');
     const [book, setBook] = useState<BookItem>();
-    const [rating, setRating] = useState<number | null>(3);
 
     useEffect(() => scrollToTop(), []);
 
@@ -40,6 +44,8 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
 
     return (
         <>
+            <CustomAlert alert={alert} setAlert={setAlert} />
+            <CustomSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
             {book && (
                 <Box
                     sx={{
@@ -76,7 +82,6 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                         </Typography>
                         <Stack
                             width={'100%'}
-                            maxWidth={944}
                             direction={{ xs: 'column', md: 'row' }}
                             alignItems={'center'}
                             justifyContent={'center'}
@@ -149,7 +154,7 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                                         width={'max-content'}
                                     >
                                         <Rating
-                                            defaultValue={
+                                            value={
                                                 book.customerReviewRank / 2
                                             }
                                             precision={0.5}
@@ -169,83 +174,11 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                             </Stack>
                         </Stack>
                         <Divider orientation="horizontal" flexItem />
-                        <Stack
-                            width={'100%'}
-                            maxWidth={944}
-                            pt={2}
-                            direction={'column'}
-                            alignItems={'center'}
-                            spacing={4}
-                        >
-                            <Typography
-                                component={'h4'}
-                                fontSize={22}
-                                fontWeight={500}
-                            >
-                                {'리플렛 평점 및 리뷰'}
-                            </Typography>
-                            <Stack
-                                width={'100%'}
-                                maxWidth={944}
-                                direction={{ xs: 'column', md: 'row' }}
-                                justifyContent={'space-around'}
-                            >
-                                <Box
-                                    display={'flex'}
-                                    alignItems={'center'}
-                                    gap={1}
-                                    width={'max-content'}
-                                >
-                                    <Rating
-                                        defaultValue={5}
-                                        precision={0.5}
-                                        readOnly
-                                        size="large"
-                                        sx={{ color: 'primary.light' }}
-                                    />
-                                    <Typography>{'10점'}</Typography>
-                                </Box>
-                                <Typography>{`리뷰 0개`}</Typography>
-                            </Stack>
-                            <Paper
-                                variant="outlined"
-                                sx={{
-                                    width: '100%',
-                                    p: 2,
-                                    borderRadius: 2,
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    gap: 2,
-                                }}
-                            >
-                                <Box width={'100%'}>
-                                    <Rating
-                                        value={rating}
-                                        onChange={(event, newValue) => {
-                                            setRating(newValue);
-                                        }}
-                                        precision={0.5}
-                                        sx={{ color: 'primary.light' }}
-                                    />
-                                    <TextField fullWidth multiline rows={3} />
-                                </Box>
-                                <Stack
-                                    direction={'column'}
-                                    alignItems={'center'}
-                                    justifyContent={'space-between'}
-                                >
-                                    <Avatar />
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            minWidth: 90,
-                                        }}
-                                    >
-                                        {'리뷰 쓰기'}
-                                    </Button>
-                                </Stack>
-                            </Paper>
-                        </Stack>
+                        <BookReviews
+                            setAlert={setAlert}
+                            setSnackbar={setSnackbar}
+                            bookId={params.bookId}
+                        />
                     </Stack>
                 </Box>
             )}

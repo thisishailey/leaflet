@@ -54,13 +54,15 @@ export default function WritePost() {
         }
 
         const loadProfile = async () => {
-            const result = await getUserProfile(user.email as string);
+            const { userProfile, error } = await getUserProfile(
+                user.email as string
+            );
 
-            if (result.error) {
+            if (error) {
                 return setAlert('프로필 사진을 불러오지 못했습니다.');
             }
 
-            const userData = result.user as UserBasic;
+            const userData = userProfile as UserBasic;
             setUserData(userData);
         };
 

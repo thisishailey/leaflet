@@ -39,7 +39,9 @@ export default function ViewPost({ search }: { search: string[] }) {
 
             for (const doc of querySnapshot.docs) {
                 const postData = doc.data() as PostData;
-                const { user, error } = await getUserProfile(postData.email);
+                const { userProfile, error } = await getUserProfile(
+                    postData.email
+                );
 
                 if (error) {
                     return;
@@ -48,7 +50,7 @@ export default function ViewPost({ search }: { search: string[] }) {
                 const newPost = {
                     id: doc.id,
                     data: postData,
-                    writer: user as UserBasic,
+                    writer: userProfile as UserBasic,
                 };
 
                 loadedPosts.push(newPost);
