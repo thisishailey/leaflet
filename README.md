@@ -16,38 +16,58 @@ A social media platform for book-lovers.
     -   TypeScript
     -   Next.js
 -   State Management
-    -   Recoil
     -   Context API
 -   API
     -   알라딘 API
-    -   네이버 지도 API
+    -   네이버 API
 -   Backend & DB
     -   Firebase Authentication
     -   Firebase Cloud Firestore
     -   Firebase Storage
     -   Vercel
--   Other
+-   Version Control
     -   Git
     -   Sourcetree
-    -   VS Code
-    -   Notion
+-   Plan & Design
     -   Figma
+    -   Notion
+-   Other
+    -   VS Code
+    -   Tiptap
+    -   uuid
 
 ## Features
 
 ### UI/UX
 
--   Sticky header(nav bar) & footer
 -   Responsive design
--   Dark mode
--   Scroll-to-top button
+-   Enable dark mode (light, system, dark)
+-   Customize Material UI
+-   Sticky header(nav bar) & footer
+-   Scroll-to-top FAB button
 
-### Authentication
+### Back-End
 
--   Sign up
--   Sign in
--   Sign out
+-   Authentication (email & password sign up, sign in, & sign out)
+-   Database (store, get, & update user data, posts, post comments, & book reviews)
+-   Storage (store & access image files)
 
-### Database
+### Posts
 
--   Store & get user data
+-   Search posts by keyword
+-   Make posts (if signed in)
+-   View posts
+-   Comment, like, & bookmark on posts (if signed in)
+
+### Books
+
+-   View bestsellers & new arrivals on Aladin (Aladin API)
+-   Search books (Aladin API)
+-   View book details
+-   Review & rate books (if signed in)
+
+### Bookstore
+
+-   Search bookstores (Naver Region Search API)
+-   View bookstores from search result (name, address, homepage link, etc.)
+-   Check bookstore's location on the map (Naver Maps API)
