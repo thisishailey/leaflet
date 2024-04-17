@@ -7,8 +7,8 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CustomAlert from '@/components/common/alert';
 import Divider from '@mui/material/Divider';
-import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
+import NaverMap from '@/components/bookstore/map';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -49,14 +49,17 @@ export default function Bookstore() {
     return (
         <Stack direction={'column'} spacing={2} py={2}>
             <CustomAlert alert={alert} setAlert={setAlert} />
-            <Modal
-                open={openModal}
-                onClose={() => setOpenModal(false)}
-                closeAfterTransition
-            >
-                <Fade in={openModal}>
-                    <Box></Box>
-                </Fade>
+            <Modal open={openModal} onClose={() => setOpenModal(false)}>
+                <Box
+                    position={'relative'}
+                    top={'50%'}
+                    left={'50%'}
+                    sx={{ transform: 'translate(-50%, -50%)' }}
+                    width={{ xs: '90%', sm: '70%', md: '60%', lg: '50%' }}
+                    height={{ xs: '60%', md: '50%' }}
+                >
+                    <NaverMap />
+                </Box>
             </Modal>
             <ToggleButtonGroup
                 exclusive
@@ -80,6 +83,7 @@ export default function Bookstore() {
                 <TextField
                     required
                     fullWidth
+                    autoComplete="off"
                     name="region"
                     placeholder="키워드나 지역 이름을 입력해 주세요."
                 />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useColorScheme } from '@mui/material/styles';
 import { BookCard } from './book';
 import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
 import Box from '@mui/material/Box';
@@ -9,6 +10,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function ViewBook({ category }: { category: string }) {
+    const { mode } = useColorScheme();
     const [books, setBooks] = useState<BookItem[]>([]);
     const [prevTab, setPrevTab] = useState<number>(1);
     const [nextTab, setNextTab] = useState<number>(1);
@@ -88,10 +90,10 @@ export default function ViewBook({ category }: { category: string }) {
                 alignItems={'center'}
                 justifyContent={'center'}
                 bgcolor={'background.paper'}
-                borderLeft={1}
-                borderRight={1}
-                borderColor={'grey.200'}
+                borderRight={2}
+                borderColor={'secondary.main'}
                 color={'grey.500'}
+                sx={{ cursor: 'pointer' }}
                 onClick={handlePrev}
             >
                 <ArrowBackIosNewIcon />
@@ -121,10 +123,10 @@ export default function ViewBook({ category }: { category: string }) {
                 alignItems={'center'}
                 justifyContent={'center'}
                 bgcolor={'background.paper'}
-                borderLeft={1}
-                borderRight={1}
-                borderColor={'grey.200'}
+                borderRight={2}
+                borderColor={'secondary.main'}
                 color={'grey.500'}
+                sx={{ cursor: 'pointer' }}
                 onClick={handleNext}
             >
                 <ArrowForwardIosIcon />
