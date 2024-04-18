@@ -27,6 +27,7 @@ export default function Bookstore() {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [place, setPlace] = useState<BookPlaceTypes>('도서관');
     const [bookPlaces, setBookPlaces] = useState<RegionSearchItem[]>();
+    const [marker, setMarker] = useState<string>('');
 
     const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -49,7 +50,13 @@ export default function Bookstore() {
     return (
         <Stack direction={'column'} spacing={2} py={2}>
             <CustomAlert alert={alert} setAlert={setAlert} />
-            <Modal open={openModal} onClose={() => setOpenModal(false)}>
+            <Modal
+                open={openModal}
+                onClose={() => {
+                    setOpenModal(false);
+                    setMarker('');
+                }}
+            >
                 <Box
                     position={'relative'}
                     top={'50%'}
@@ -58,7 +65,7 @@ export default function Bookstore() {
                     width={{ xs: '90%', sm: '70%', md: '60%', lg: '50%' }}
                     height={{ xs: '60%', md: '50%' }}
                 >
-                    <NaverMap />
+                    <NaverMap address={marker} />
                 </Box>
             </Modal>
             <ToggleButtonGroup
@@ -102,7 +109,6 @@ export default function Bookstore() {
                                 flexDirection: 'column',
                                 gap: 2,
                                 p: 3,
-                                cursor: 'pointer',
                             }}
                         >
                             <Stack
@@ -118,7 +124,10 @@ export default function Bookstore() {
                                 ></div>
                                 <Tooltip title="지도 보기" placement="right">
                                     <IconButton
-                                        onClick={() => setOpenModal(true)}
+                                        onClick={() => {
+                                            setMarker(place.address);
+                                            setOpenModal(true);
+                                        }}
                                     >
                                         <MapIcon color="primary" />
                                     </IconButton>
