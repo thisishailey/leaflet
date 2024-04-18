@@ -41,7 +41,7 @@ export function PostPreview({
                 <CardHeader
                     avatar={
                         <Avatar src={profileSrc} alt={username}>
-                            {!profileSrc && username}
+                            {!profileSrc && username.charAt(0)}
                         </Avatar>
                     }
                     action={

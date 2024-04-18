@@ -53,6 +53,10 @@ export default function Header() {
             }
         }
 
+        if (pathname.startsWith('/auth')) {
+            return setCurrentTab(null);
+        }
+
         const tab = tabs.findLast((tab) => pathname.startsWith(tab.link));
         if (tab) {
             if (currentTab !== tab.name) {
@@ -171,7 +175,7 @@ export default function Header() {
                             src={currentUser.profileSrc}
                             alt={currentUser.username}
                         >
-                            {currentUser.username}
+                            {currentUser.username.charAt(0)}
                         </Avatar>
                     ) : (
                         <Avatar

@@ -207,7 +207,7 @@ export default function Post({ params }: { params: { postId: string } }) {
                             alt={post?.username}
                             sx={{ width: 28, height: 28 }}
                         >
-                            {post?.username}
+                            {post?.username?.charAt(0)}
                         </Avatar>
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}
@@ -311,9 +311,10 @@ export default function Post({ params }: { params: { postId: string } }) {
                             avatar={
                                 <Avatar
                                     src={comment.profileSrc}
+                                    alt={comment.username}
                                     sx={{ width: 24, height: 24 }}
                                 >
-                                    {comment.username}
+                                    {comment.username.charAt(0)}
                                 </Avatar>
                             }
                             action={
@@ -390,8 +391,11 @@ export default function Post({ params }: { params: { postId: string } }) {
                         justifyContent={'space-between'}
                         spacing={1}
                     >
-                        <Avatar src={currentUser?.profileSrc}>
-                            {currentUser?.username}
+                        <Avatar
+                            src={currentUser?.profileSrc}
+                            alt={currentUser?.username}
+                        >
+                            {currentUser?.username?.charAt(0)}
                         </Avatar>
                         <Button
                             type="submit"

@@ -48,7 +48,7 @@ export default function Bookstore() {
     };
 
     return (
-        <Stack direction={'column'} spacing={2} py={2}>
+        <Stack direction={'column'} spacing={2}>
             <CustomAlert alert={alert} setAlert={setAlert} />
             <Modal
                 open={openModal}

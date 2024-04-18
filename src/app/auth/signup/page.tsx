@@ -7,9 +7,10 @@ import addData from '@/firebase/db/addData';
 import updateData from '@/firebase/db/updateData';
 import uploadFile from '@/firebase/storage/uploadFile';
 import { PROFILE_IMAGE } from '@/firebase/storage/directory';
-import { COLLECTION_USER, type UserDataUpdate } from '@/firebase/db/model';
+import { type UserDataUpdate, COLLECTION_USER } from '@/firebase/db/model';
 
 import { CopyrightShort } from '@/components/common/copyright';
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -26,32 +27,63 @@ import Stepper from '@mui/material/Stepper';
 import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { checkUsernameAvailability } from '@/firebase/db/query';
 
-const steps = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
+interface PasswordVisibility {
+    password: boolean;
+    rePassword: boolean;
+}
+
+interface RePasswordState {
+    value: string;
+    helper: string;
+    error: boolean;
+}
+
+interface UserDataState {
+    email: string;
+    password: string;
+    username: string;
+    imagePreviewUrl: string;
+}
+
+interface UsernameState {
+    helper: string;
+    error: boolean;
+}
+
+const steps: string[] = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
+const passwordPattern: string = '(?=.*[0-9])(?=.*[a-z]).{8,}';
+const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
 
 export default function SignUp() {
     const { replace } = useRouter();
 
     const [alert, setAlert] = useState<string>('');
-    const [showPassword, setShowPassword] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
-    const [email, setEmail] = useState<string>('');
-    const [username, setUsername] = useState<string>('');
-    const [userImage, setUserImage] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [passwordHelper, setPasswordHelper] = useState<string>('');
+    const [showPassword, setShowPassword] = useState<PasswordVisibility>({
+        password: false,
+        rePassword: false,
+    });
+    const [rePassword, setRePassword] = useState<RePasswordState>({
+        value: '',
+        helper: '',
+        error: false,
+    });
 
-    const handleTogglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
-    const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            const image = files[0];
-            const url = URL.createObjectURL(image);
-            setUserImage(url);
-        }
-    };
+    const [username, setUsername] = useState<UsernameState>({
+        helper: '',
+        error: false,
+    });
+    const [userData, setUserData] = useState<UserDataState>({
+        email: '',
+        password: '',
+        username: '',
+        imagePreviewUrl: '',
+    });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -75,42 +107,147 @@ export default function SignUp() {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
 
-    const handleStepOne = async (data: FormData) => {
-        const email = data.get('email') as string;
-        setEmail(email);
-        const password = data.get('password') as string;
+    const handlePasswordChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const value = event.target.value;
+        setPassword(value);
 
-        const { error } = await authSignUp({ email, password });
-
-        if (error) {
-            return setAlert(error.message);
+        if (value === '') {
+            return setRePassword((prev) => ({
+                ...prev,
+                helper: '비밀번호를 먼저 입력해 주세요.',
+            }));
+        } else if (!RegExp(passwordPattern).test(value)) {
+            setPasswordHelper(
+                '비밀번호는 8자 이상, 영문 소문자와 숫자가 각각 1자 이상 들어가야 합니다.'
+            );
+        } else {
+            setPasswordHelper('');
         }
 
+        handleCheckPassword(value, rePassword.value);
+    };
+
+    const handleRePasswordChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const value = event.target.value;
+
+        setRePassword((prev) => ({
+            ...prev,
+            value,
+        }));
+
+        handleCheckPassword(password, value);
+    };
+
+    const handleCheckPassword = (v1: string, v2: string) => {
+        let helper: string;
+        let error: boolean = false;
+
+        if (v2 === '') {
+            return;
+        }
+
+        if (v1 === v2) {
+            helper = '비밀번호와 일치합니다.';
+        } else {
+            helper = '비밀번호와 일치하지 않습니다.';
+            error = true;
+        }
+
+        setRePassword((prev) => ({
+            ...prev,
+            helper,
+            error,
+        }));
+    };
+
+    const handleStepOne = async (data: FormData) => {
+        const email = data.get('email') as string;
+        const password = data.get('password') as string;
+        const rePassword = data.get('re-password') as string;
+
+        if (password !== rePassword) {
+            return setAlert('비밀번호가 일치하지 않습니다.');
+        }
+
+        setUserData((prev) => ({ ...prev, email, password }));
         handleNextStep();
+    };
+
+    const handleCheckUsername = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const value = event.target.value;
+        let helper: string = '';
+        let error: boolean = false;
+
+        if (value === '') {
+            helper = '';
+            error = false;
+        } else if (value.length < 4 || value.length > 16) {
+            helper = '아이디는 4자 이상 16자 이하입니다.';
+            error = true;
+        } else if (!RegExp(usernamePattern).test(value)) {
+            helper =
+                '아이디는 영문 대소문자와 숫자, 밑줄(_)만 입력 가능합니다.';
+            error = true;
+        } else {
+            const isAvailable: boolean = await checkUsernameAvailability(value);
+            if (isAvailable) {
+                helper = '사용 가능한 아이디입니다.';
+                error = false;
+            } else {
+                helper = '이미 존재하는 아이디입니다.';
+                error = true;
+            }
+        }
+
+        setUsername({ helper, error });
     };
 
     const handleStepTwo = async (data: FormData) => {
         const username = data.get('username') as string;
-        setUsername(username);
         const firstname = data.get('firstname') as string;
         const lastname = data.get('lastname') as string;
 
-        const { error } = await addData(
+        const authResult = await authSignUp({
+            email: userData.email,
+            password: userData.password,
+        });
+
+        if (authResult.error) {
+            return setAlert(authResult.error.message);
+        }
+
+        const dbResult = await addData(
             COLLECTION_USER,
             {
-                email,
+                email: userData.email,
                 username,
                 firstname,
                 lastname,
             },
-            email
+            userData.email
         );
 
-        if (error) {
-            return setAlert(error.message);
+        if (dbResult.error) {
+            return setAlert(dbResult.error.message);
         }
 
+        setUserData((prev) => ({ ...prev, username }));
         handleNextStep();
+    };
+
+    const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const image = files[0];
+            const imagePreviewUrl = URL.createObjectURL(image);
+            setUserData((prev) => ({ ...prev, imagePreviewUrl }));
+        }
     };
 
     const handleStepThree = async (data: FormData) => {
@@ -135,7 +272,7 @@ export default function SignUp() {
             newData = { ...newData, bio };
         }
 
-        const { error } = await updateData('user', email, newData);
+        const { error } = await updateData('user', userData.email, newData);
 
         if (error) {
             return setAlert(error.message);
@@ -150,13 +287,19 @@ export default function SignUp() {
             <style>
                 {`main {min-height: 0 !important;} footer {display: none;} #bottom-action-buttons {display: none;}`}
             </style>
+            <CustomAlert alert={alert} setAlert={setAlert} />
+            <Alert
+                severity="info"
+                sx={{ display: activeStep === 2 ? 'flex' : 'none' }}
+            >
+                {'필수 항목이 아닙니다.'}
+            </Alert>
             <Stack
                 direction={'column'}
                 alignItems={'center'}
-                mt={{ xs: 0, sm: 2, md: 4 }}
+                mt={{ xs: 2, md: 4 }}
                 p={2}
             >
-                <CustomAlert alert={alert} setAlert={setAlert} />
                 <Stepper
                     activeStep={activeStep}
                     alternativeLabel
@@ -181,7 +324,6 @@ export default function SignUp() {
                                 required
                                 fullWidth
                                 margin="dense"
-                                id="email"
                                 name="email"
                                 type="email"
                                 label="이메일"
@@ -191,21 +333,69 @@ export default function SignUp() {
                                 required
                                 fullWidth
                                 margin="dense"
-                                id="password"
                                 name="password"
-                                type={showPassword ? 'text' : 'password'}
                                 label="비밀번호"
                                 autoComplete="new-password"
+                                type={
+                                    showPassword.password ? 'text' : 'password'
+                                }
+                                inputProps={{ pattern: passwordPattern }}
+                                onChange={handlePasswordChange}
+                                helperText={passwordHelper}
+                                error={passwordHelper !== ''}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton
                                                 aria-label="toggle password visibility"
-                                                onClick={
-                                                    handleTogglePasswordVisibility
+                                                onClick={() =>
+                                                    setShowPassword((prev) => ({
+                                                        ...prev,
+                                                        password:
+                                                            !prev.password,
+                                                    }))
                                                 }
                                             >
-                                                {showPassword ? (
+                                                {showPassword.password ? (
+                                                    <Visibility />
+                                                ) : (
+                                                    <VisibilityOff />
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <TextField
+                                required
+                                fullWidth
+                                margin="dense"
+                                name="re-password"
+                                label="비밀번호 재입력"
+                                autoComplete="new-password"
+                                type={
+                                    showPassword.rePassword
+                                        ? 'text'
+                                        : 'password'
+                                }
+                                onChange={handleRePasswordChange}
+                                disabled={password === ''}
+                                error={rePassword.error}
+                                helperText={rePassword.helper}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() =>
+                                                    setShowPassword((prev) => ({
+                                                        ...prev,
+                                                        rePassword:
+                                                            !prev.rePassword,
+                                                    }))
+                                                }
+                                            >
+                                                {showPassword.rePassword ? (
                                                     <Visibility />
                                                 ) : (
                                                     <VisibilityOff />
@@ -218,7 +408,7 @@ export default function SignUp() {
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        id="receiveEmail"
+                                        name="receiveEmail"
                                         value="receiveEmail"
                                         color="primary"
                                         size="small"
@@ -235,7 +425,6 @@ export default function SignUp() {
                                 <TextField
                                     required
                                     fullWidth
-                                    id="lastname"
                                     name="lastname"
                                     type="string"
                                     label="성"
@@ -245,7 +434,6 @@ export default function SignUp() {
                                 <TextField
                                     required
                                     fullWidth
-                                    id="firstname"
                                     name="firstname"
                                     type="string"
                                     label="이름"
@@ -255,11 +443,14 @@ export default function SignUp() {
                             <TextField
                                 required
                                 fullWidth
-                                id="username"
                                 name="username"
                                 type="string"
                                 label="아이디"
                                 autoComplete="username"
+                                inputProps={{ pattern: usernamePattern }}
+                                onChange={handleCheckUsername}
+                                helperText={username.helper}
+                                error={username.error}
                             />
                         </>
                     )}
@@ -276,8 +467,8 @@ export default function SignUp() {
                                 }}
                             >
                                 <Avatar
-                                    src={userImage}
-                                    alt={username}
+                                    src={userData.imagePreviewUrl}
+                                    alt={userData.username}
                                     sx={{
                                         width: 60,
                                         height: 60,
@@ -285,9 +476,7 @@ export default function SignUp() {
                                     slotProps={{
                                         img: { width: 60, height: 60 },
                                     }}
-                                >
-                                    {username}
-                                </Avatar>
+                                />
                                 <Button size="large">
                                     <Box
                                         component={'label'}
@@ -312,7 +501,6 @@ export default function SignUp() {
                                 multiline
                                 rows={4}
                                 margin="normal"
-                                id="bio"
                                 name="bio"
                                 type="string"
                                 label="바이오"

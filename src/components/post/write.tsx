@@ -384,7 +384,7 @@ export default function WritePost() {
                                         display: { xs: 'none', sm: 'flex' },
                                     }}
                                 >
-                                    {profile?.username}
+                                    {profile?.username.charAt(0)}
                                 </Avatar>
                                 <Button
                                     variant="contained"

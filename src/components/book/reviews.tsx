@@ -1,14 +1,14 @@
 'use client';
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import { useAuthContext } from '@/firebase/auth/state';
 import type { User } from 'firebase/auth';
 import addData from '@/firebase/db/addData';
 import {
     type BookReview,
+    type UserBasic,
     getReviews,
     getUserProfile,
-    UserBasic,
 } from '@/firebase/db/getData';
 import { type ReviewData, COLLECTION_REVIEW } from '@/firebase/db/model';
 
@@ -229,7 +229,7 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                             src={anonymous ? '' : currentUser?.profileSrc}
                             alt={currentUser?.username}
                         >
-                            {anonymous ? '' : currentUser?.username}
+                            {anonymous ? '' : currentUser?.username.charAt(0)}
                         </Avatar>
                         <FormControlLabel
                             control={
@@ -307,7 +307,9 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                                     }
                                     sx={{ width: 28, height: 28 }}
                                 >
-                                    {review.anonymous ? '' : review.username}
+                                    {review.anonymous
+                                        ? ''
+                                        : review.username?.charAt(0)}
                                 </Avatar>
                                 <Typography fontWeight={500}>
                                     {review.anonymous
