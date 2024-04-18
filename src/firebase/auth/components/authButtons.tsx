@@ -22,7 +22,7 @@ export default function AuthButtons() {
 
     return (
         <Container sx={{ textAlign: 'center' }}>
-            {typeof user === 'string' ? (
+            {user === null ? (
                 <Button size="large" onClick={() => push('/auth/signin')}>
                     {'로그인'}
                 </Button>

@@ -20,6 +20,7 @@ export default function ViewPost({ search }: { search: string[] }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [noPost, setNoPost] = useState(false);
     const [noSearchResult, setNoSearchResult] = useState(false);
+	
     const noPostText = '리프가 없습니다.';
     const noSearchResultText = '검색 결과가 없습니다.';
 
@@ -39,18 +40,16 @@ export default function ViewPost({ search }: { search: string[] }) {
 
             for (const doc of querySnapshot.docs) {
                 const postData = doc.data() as PostData;
-                const { userProfile, error } = await getUserProfile(
-                    postData.email
-                );
+                const user = await getUserProfile(postData.email);
 
-                if (error) {
+                if (user.error) {
                     return;
                 }
 
                 const newPost = {
                     id: doc.id,
                     data: postData,
-                    writer: userProfile as UserBasic,
+                    writer: user.data as UserBasic,
                 };
 
                 loadedPosts.push(newPost);

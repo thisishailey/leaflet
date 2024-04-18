@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import { Copyright } from '../common/copyright';
 import FacebookIcon from '@mui/icons-material/Facebook';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import XIcon from '@mui/icons-material/X';
-import GitHubIcon from '@mui/icons-material/GitHub';
 
 export default function Footer() {
     const sms = [
@@ -49,7 +49,7 @@ export default function Footer() {
                             <Link
                                 key={media.name}
                                 href={media.link}
-                                style={{ height: '24px' }}
+                                style={{ height: 24 }}
                             >
                                 {media.icon}
                             </Link>

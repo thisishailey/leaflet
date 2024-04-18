@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Fab from '@mui/material/Fab';
 import Popover from '@mui/material/Popover';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
@@ -25,38 +26,40 @@ export default function BottomActionButtons() {
     return (
         <div id="bottom-action-buttons">
             <Box
-                sx={{
-                    position: 'fixed',
-                    bottom: 30,
-                    right: 30,
-                    display: 'flex',
-                    gap: '10px',
-                }}
+                position={'fixed'}
+                bottom={30}
+                right={30}
+                display={'flex'}
+                gap={1}
             >
-                <Fab
-                    aria-label="scroll back to top"
-                    onClick={scrollToTop}
-                    color="secondary"
-                    size="small"
-                    sx={{
-                        border: 1,
-                        borderColor: 'grey.500',
-                    }}
-                >
-                    <VerticalAlignTopRoundedIcon />
-                </Fab>
-                <Fab
-                    aria-label="website settings"
-                    onClick={handleOpenSetting}
-                    color="secondary"
-                    size="small"
-                    sx={{
-                        border: 1,
-                        borderColor: 'grey.500',
-                    }}
-                >
-                    <SettingsIcon />
-                </Fab>
+                <Tooltip title="맨 위로" placement="top">
+                    <Fab
+                        size="small"
+                        color="secondary"
+                        onClick={scrollToTop}
+                        sx={{
+                            border: 1,
+                            borderColor: 'grey.500',
+                        }}
+                        aria-label="scroll back to top"
+                    >
+                        <VerticalAlignTopRoundedIcon />
+                    </Fab>
+                </Tooltip>
+                <Tooltip title="환경설정" placement="top">
+                    <Fab
+                        size="small"
+                        color="secondary"
+                        onClick={handleOpenSetting}
+                        sx={{
+                            border: 1,
+                            borderColor: 'grey.500',
+                        }}
+                        aria-label="website settings"
+                    >
+                        <SettingsIcon />
+                    </Fab>
+                </Tooltip>
                 <Popover
                     id={anchorEl ? 'website-setting-popover' : undefined}
                     open={Boolean(anchorEl)}
@@ -71,15 +74,11 @@ export default function BottomActionButtons() {
                         horizontal: 'right',
                     }}
                     elevation={5}
-                    slotProps={{ paper: { sx: { borderRadius: '8px' } } }}
+                    slotProps={{ paper: { sx: { borderRadius: 2 } } }}
                     disableScrollLock
                 >
-                    <Container sx={{ padding: '1.2rem' }}>
-                        <Typography
-                            component={'h4'}
-                            fontWeight={600}
-                            mb={'10px'}
-                        >
+                    <Container sx={{ padding: 2 }}>
+                        <Typography fontWeight={600} mb={2}>
                             {'화면 스타일'}
                         </Typography>
                         <ModeSwitcher />

@@ -16,7 +16,7 @@ export default function CustomAlert({ alert, setAlert }: Props) {
             addEndListener={() =>
                 setTimeout(() => {
                     setAlert('');
-                }, 400000)
+                }, 4000)
             }
         >
             <Alert

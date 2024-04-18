@@ -1,8 +1,9 @@
 import { storage } from '../config';
-import { ref, uploadBytes, UploadResult } from 'firebase/storage';
+import { ref, uploadBytes, type UploadResult } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
+import type { ImageFolders } from './directory';
 
-export default async function uploadFile(folder: string, file: File) {
+export default async function uploadFile(folder: ImageFolders, file: File) {
     const uniqueId = uuidv4();
     const imageUrl = `/${folder}/${uniqueId}/${file.name}`;
     const storageRef = ref(storage, imageUrl);

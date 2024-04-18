@@ -1,16 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useColorScheme } from '@mui/material/styles';
-import { BookCard } from './book';
 import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
+import { BookCard } from './book';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function ViewBook({ category }: { category: string }) {
-    const { mode } = useColorScheme();
     const [books, setBooks] = useState<BookItem[]>([]);
     const [prevTab, setPrevTab] = useState<number>(1);
     const [nextTab, setNextTab] = useState<number>(1);

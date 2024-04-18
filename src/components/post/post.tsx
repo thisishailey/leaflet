@@ -1,10 +1,10 @@
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
+import Link from 'next/link';
 import Avatar from '@mui/material/Avatar';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import Link from 'next/link';
 
 interface PreviewProps {
     id: string;
@@ -24,7 +24,7 @@ export function PostPreview({
             href={`/post/${id}`}
             style={{
                 width: '100%',
-                maxWidth: '900px',
+                maxWidth: 900,
                 display: 'flex',
                 justifyContent: 'center',
             }}
@@ -40,7 +40,7 @@ export function PostPreview({
             >
                 <CardHeader
                     avatar={
-                        <Avatar src={profileSrc}>
+                        <Avatar src={profileSrc} alt={username}>
                             {!profileSrc && username}
                         </Avatar>
                     }

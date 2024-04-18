@@ -17,8 +17,8 @@ export default function Wrapper({ children }: { children: React.ReactNode }) {
                 sx={{
                     maxWidth: '1024px',
                     minHeight: '100vh',
-                    margin: '0 auto',
-                    padding: '1rem',
+                    m: '0 auto',
+                    p: 3,
                 }}
             >
                 {children}

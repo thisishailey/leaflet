@@ -1,12 +1,9 @@
 'use client';
 
-import { HTMLAttributes, Key, useState } from 'react';
+import { type HTMLAttributes, type Key, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import type {
-    BookSearchItemData,
-    BookItem,
-} from '@/app/api/books/type';
+import type { BookSearchItemData, BookItem } from '@/app/api/books/type';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';

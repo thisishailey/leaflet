@@ -10,12 +10,11 @@ import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { COLLECTION_USER, type UserDataUpdate } from '@/firebase/db/model';
 
 import { CopyrightShort } from '@/components/common/copyright';
-import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
-import Fade from '@mui/material/Fade';
+import CustomAlert from '@/components/common/alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -25,7 +24,6 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import TextField from '@mui/material/TextField';
-
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -97,8 +95,6 @@ export default function SignUp() {
         const firstname = data.get('firstname') as string;
         const lastname = data.get('lastname') as string;
 
-        // TODO check username availability
-
         const { error } = await addData(
             COLLECTION_USER,
             {
@@ -154,29 +150,13 @@ export default function SignUp() {
             <style>
                 {`main {min-height: 0 !important;} footer {display: none;} #bottom-action-buttons {display: none;}`}
             </style>
-            <Box
-                sx={{
-                    mt: { xs: 0, sm: 2, md: 4 },
-                    padding: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
+            <Stack
+                direction={'column'}
+                alignItems={'center'}
+                mt={{ xs: 0, sm: 2, md: 4 }}
+                p={2}
             >
-                <Fade in={alert !== ''}>
-                    <Alert
-                        severity="error"
-                        sx={{
-                            width: '100%',
-                            maxWidth: 900,
-                            mb: 4,
-                            borderRadius: 2,
-                            display: alert ? 'flex' : 'none',
-                        }}
-                    >
-                        {alert}
-                    </Alert>
-                </Fade>
+                <CustomAlert alert={alert} setAlert={setAlert} />
                 <Stepper
                     activeStep={activeStep}
                     alternativeLabel
@@ -373,7 +353,7 @@ export default function SignUp() {
                         </Button>
                     )}
                 </Box>
-            </Box>
+            </Stack>
             <CopyrightShort sx={{ mt: { xs: 4, md: 6 }, mb: 4 }} />
         </>
     );

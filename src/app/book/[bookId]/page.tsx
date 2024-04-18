@@ -10,13 +10,13 @@ import BookReviews from '@/components/book/reviews';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import CustomAlert from '@/components/common/alert';
+import CustomSnackbar from '@/components/common/snackbar';
 import Divider from '@mui/material/Divider';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import CustomSnackbar from '@/components/common/snackbar';
 
 export default function BookDetail({ params }: { params: { bookId: string } }) {
     const { push } = useRouter();
@@ -47,14 +47,7 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
             <CustomAlert alert={alert} setAlert={setAlert} />
             <CustomSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
             {book && (
-                <Box
-                    sx={{
-                        width: '100%',
-                        maxWidth: 976,
-                        height: '100%',
-                        p: 2,
-                    }}
-                >
+                <Box width={'100%'} maxWidth={976} height={'100%'} p={2}>
                     <Breadcrumbs
                         separator={
                             <NavigateNextIcon sx={{ width: 16, height: 16 }} />
@@ -154,9 +147,7 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                                         width={'max-content'}
                                     >
                                         <Rating
-                                            value={
-                                                book.customerReviewRank / 2
-                                            }
+                                            value={book.customerReviewRank / 2}
                                             precision={0.5}
                                             readOnly
                                         />

@@ -2,7 +2,7 @@
 
 import { useAuthContext } from '@/firebase/auth/state';
 import AuthButtons from '@/firebase/auth/components/authButtons';
-import UserProfile from '@/components/user/userProfile';
+import UserProfile from '@/components/user/profile';
 
 export default function Profile() {
     const { user } = useAuthContext();
@@ -10,9 +10,7 @@ export default function Profile() {
     return (
         <div>
             <AuthButtons />
-            {typeof user !== 'string' && (
-                <UserProfile id={user.email as string} />
-            )}
+            {user && <UserProfile email={user.email as string} />}
         </div>
     );
 }

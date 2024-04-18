@@ -37,33 +37,30 @@ import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 
 export default function WritePost() {
     const CHAR_LIMIT = 500;
-    const { user } = useAuthContext();
+    const { user, loading } = useAuthContext();
 
     const [alert, setAlert] = useState<string>('');
-    const [open, setOpen] = useState(false);
     const [complete, setComplete] = useState<string>('');
+    const [open, setOpen] = useState(false);
 
-    const [userData, setUserData] = useState<UserBasic>();
+    const [profile, setProfile] = useState<UserBasic>();
     const [clickedImage, setClickedImage] = useState<string>('');
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string[]>([]);
     const [uploadedImage, setUploadedImage] = useState<File[]>([]);
 
     useEffect(() => {
-        if (!user || user === 'none' || user === 'loading') {
+        if (!user) {
             return;
         }
 
         const loadProfile = async () => {
-            const { userProfile, error } = await getUserProfile(
-                user.email as string
-            );
+            const result = await getUserProfile(user.email as string);
 
-            if (error) {
+            if (result.error) {
                 return setAlert('프로필 사진을 불러오지 못했습니다.');
             }
 
-            const userData = userProfile as UserBasic;
-            setUserData(userData);
+            setProfile(result.data as UserBasic);
         };
 
         loadProfile();
@@ -122,7 +119,7 @@ export default function WritePost() {
             name: '링크',
             command: 'link',
             icon: <InsertLinkIcon />,
-            onclick: () => {}, // TODO link upload function
+            onclick: () => {},
         },
     ];
 
@@ -131,11 +128,12 @@ export default function WritePost() {
         if (files) {
             const image = files[0];
             setUploadedImage(uploadedImage.concat(image));
+
             const url = URL.createObjectURL(image);
             setImagePreviewUrl(imagePreviewUrl.concat(url));
         }
     };
-    // TODO add photo delete option
+
     const handleOpenPreview = (url: string) => {
         setClickedImage(url);
         setOpen(true);
@@ -146,7 +144,13 @@ export default function WritePost() {
             return setAlert('내용을 입력해 주세요.');
         }
 
-        const email = userData?.email as string;
+        if (!user || !user.email) {
+            return setAlert(
+                '유저 정보가 올바르지 않습니다. 재로그인 후 다시 시도해 주세요.'
+            );
+        }
+
+        const email = user.email;
         const content = editor.getHTML();
 
         const images: string[] = [];
@@ -158,7 +162,9 @@ export default function WritePost() {
                 );
 
                 if (error) {
-                    setAlert(error.message);
+                    setAlert(
+                        `이미지 파일 '${uploadedImage[i].name}'을 업로드하지 못했습니다.`
+                    );
                     continue;
                 }
 
@@ -173,11 +179,11 @@ export default function WritePost() {
 
         const { error } = await addData(COLLECTION_POST, data);
         if (error) {
-            return setAlert(error.message);
+            return setAlert('리프를 업로드하지 못했습니다.');
         }
 
-        editor.commands.clearContent();
         setComplete('리프가 업로드 되었어요!');
+        editor.commands.clearContent();
         setUploadedImage([]);
         setImagePreviewUrl([]);
         setClickedImage('');
@@ -186,7 +192,7 @@ export default function WritePost() {
 
     return (
         <>
-            {user && user !== 'none' && user !== 'loading' && (
+            {user && (
                 <>
                     <Backdrop
                         open={open}
@@ -216,8 +222,8 @@ export default function WritePost() {
                                 <Stack
                                     direction={'row'}
                                     spacing={0.5}
-                                    p={0.5}
                                     width={'100%'}
+                                    p={0.5}
                                 >
                                     <Box
                                         id={'editor'}
@@ -230,8 +236,8 @@ export default function WritePost() {
                                             !editor?.isFocused && (
                                                 <Box
                                                     component={'span'}
-                                                    color={'primary.light'}
                                                     position={'absolute'}
+                                                    color={'primary.light'}
                                                 >
                                                     {'리프를 작성해 보세요 🌿'}
                                                 </Box>
@@ -242,14 +248,14 @@ export default function WritePost() {
                                                 editor={editor}
                                                 tippyOptions={{ duration: 100 }}
                                             >
-                                                <ToggleButtonGroup>
+                                                <ToggleButtonGroup aria-label="text formatting">
                                                     {formatOptions.map(
                                                         (option) => (
                                                             <ToggleButton
                                                                 sx={{
+                                                                    p: 1,
                                                                     bgcolor:
                                                                         'secondary.main',
-                                                                    p: 1,
                                                                     '&:hover': {
                                                                         bgcolor:
                                                                             'secondary.dark',
@@ -368,17 +374,17 @@ export default function WritePost() {
                             </Paper>
                             <Stack
                                 direction={'column'}
-                                spacing={1}
                                 alignItems={{ xs: 'flex-end', sm: 'center' }}
                                 justifyContent={'space-between'}
+                                spacing={1}
                             >
                                 <Avatar
-                                    src={userData?.profileSrc}
+                                    src={profile?.profileSrc}
                                     sx={{
                                         display: { xs: 'none', sm: 'flex' },
                                     }}
                                 >
-                                    {userData?.username}
+                                    {profile?.username}
                                 </Avatar>
                                 <Button
                                     variant="contained"
@@ -413,7 +419,7 @@ export default function WritePost() {
                     </Fade>
                 </>
             )}
-            {user && user === 'none' && (
+            {!loading && !user && (
                 <Paper
                     variant="outlined"
                     sx={{

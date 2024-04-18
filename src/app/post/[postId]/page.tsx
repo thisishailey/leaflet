@@ -59,24 +59,23 @@ export default function Post({ params }: { params: { postId: string } }) {
     useEffect(() => scrollToTop(), []);
 
     useEffect(() => {
-        if (!user || user === 'none' || user === 'loading') {
+        if (!user) {
             return;
         }
 
         const getCurrentUser = async () => {
-            const { currentUser, error } = await getCurrentUserOnPost(
+            const result = await getCurrentUserOnPost(
                 user.email as string,
                 params.postId
             );
 
-            if (error) {
+            if (result.error) {
                 return setAlert('회원 정보를 불러오지 못했습니다.');
             }
 
-            setAlert('');
-            setCurrentUser(currentUser as CurrentUserPost);
-            setIsLiked(currentUser?.like || false);
-            setIsBookmarked(currentUser?.bookmark || false);
+            setCurrentUser(result.data as CurrentUserPost);
+            setIsLiked(result.data?.like || false);
+            setIsBookmarked(result.data?.bookmark || false);
         };
 
         getCurrentUser();
@@ -84,16 +83,15 @@ export default function Post({ params }: { params: { postId: string } }) {
 
     useEffect(() => {
         const loadPost = async () => {
-            const { post, error } = await getPost(params.postId);
+            const result = await getPost(params.postId);
 
-            if (error) {
+            if (result.error) {
                 return setAlert('게시글을 불러오지 못했습니다.');
             }
 
-            setAlert('');
-            setPost(post as PostDetail);
-            setLikesCount(post?.likes || 0);
-            setComments(post?.comments || []);
+            setPost(result.data as PostDetail);
+            setLikesCount(result.data?.likes || 0);
+            setComments(result.data?.comments || []);
         };
 
         loadPost();
@@ -104,9 +102,9 @@ export default function Post({ params }: { params: { postId: string } }) {
             {'로그인이 필요합니다.'}
             <Link href={'/auth/signin'}>
                 <Typography
+                    component={'span'}
                     fontSize={13}
                     fontWeight={500}
-                    component={'span'}
                     ml={5}
                 >
                     {'로그인하러 가기'}
@@ -201,8 +199,8 @@ export default function Post({ params }: { params: { postId: string } }) {
                 >
                     <Stack
                         direction={'row'}
-                        spacing={2}
                         alignItems={{ xs: 'center', md: 'flex-start' }}
+                        spacing={2}
                     >
                         <Avatar
                             src={post?.profileSrc}
@@ -213,8 +211,8 @@ export default function Post({ params }: { params: { postId: string } }) {
                         </Avatar>
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}
-                            spacing={{ xs: 0, md: 3 }}
                             alignItems={'baseline'}
+                            spacing={{ xs: 0, md: 3 }}
                         >
                             <Typography fontSize={18} fontWeight={600}>
                                 {post?.username}
@@ -348,20 +346,20 @@ export default function Post({ params }: { params: { postId: string } }) {
             </Paper>
             <Box height={200} />
             <Box
+                position={'fixed'}
+                bottom={20}
+                left={'50%'}
                 sx={{
-                    position: 'fixed',
-                    bottom: 20,
-                    left: '50%',
                     transform: 'translateX(-50%)',
-                    width: '100%',
-                    maxWidth: 950,
-                    p: 2,
                 }}
+                width={'100%'}
+                maxWidth={950}
+                p={2}
             >
                 <Paper
                     component={'form'}
-                    onSubmit={handleSubmit}
                     variant="outlined"
+                    onSubmit={handleSubmit}
                     sx={{
                         p: 2,
                         borderRadius: 4,
@@ -388,9 +386,9 @@ export default function Post({ params }: { params: { postId: string } }) {
                     />
                     <Stack
                         direction={'column'}
-                        spacing={1}
                         alignItems={'center'}
                         justifyContent={'space-between'}
+                        spacing={1}
                     >
                         <Avatar src={currentUser?.profileSrc}>
                             {currentUser?.username}

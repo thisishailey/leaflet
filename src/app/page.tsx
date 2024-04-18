@@ -7,8 +7,8 @@ import WritePost from '@/components/post/write';
 import ViewPost from '@/components/post/view';
 import Fab from '@mui/material/Fab';
 import Stack from '@mui/material/Stack';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 export default function Home() {
     const [search, setSearch] = useState<string[]>([]);

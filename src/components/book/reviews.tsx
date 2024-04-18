@@ -15,6 +15,7 @@ import { type ReviewData, COLLECTION_REVIEW } from '@/firebase/db/model';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
@@ -23,7 +24,6 @@ import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Divider } from '@mui/material';
 
 interface Props {
     setAlert: Dispatch<SetStateAction<string>>;
@@ -50,15 +50,13 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
         }
 
         const loadUser = async () => {
-            const { userProfile } = await getUserProfile(
-                (user as User).email as string
-            );
+            const result = await getUserProfile((user as User).email as string);
 
-            if (!userProfile) {
+            if (!result.data) {
                 return setAlert('프로필 정보를 불러오지 못했습니다.');
             }
 
-            setCurrentUser(userProfile);
+            setCurrentUser(result.data);
         };
 
         loadUser();

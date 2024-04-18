@@ -6,17 +6,15 @@ import Link from 'next/link';
 import authSignIn from '@/firebase/auth/signin';
 
 import { CopyrightShort } from '@/components/common/copyright';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import Fade from '@mui/material/Fade';
+import CustomAlert from '@/components/common/alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -57,33 +55,20 @@ export default function SignIn() {
             <Box
                 sx={{
                     mt: { xs: 2, md: 8 },
-                    padding: 2,
+                    p: 2,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}
             >
-                <Fade in={alert !== ''}>
-                    <Alert
-                        severity="error"
-                        sx={{
-                            width: '100%',
-                            maxWidth: 900,
-                            mb: 4,
-                            borderRadius: 2,
-                            display: alert ? 'flex' : 'none',
-                        }}
-                    >
-                        {alert}
-                    </Alert>
-                </Fade>
-                <Typography component="h3" fontSize={'28px'} fontWeight={500}>
+                <CustomAlert alert={alert} setAlert={setAlert} />
+                <Typography component="h3" fontSize={28} fontWeight={500}>
                     {'로그인'}
                 </Typography>
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
-                    sx={{ mt: { xs: 2, md: 4 }, maxWidth: '397px' }}
+                    sx={{ mt: { xs: 2, md: 4 }, maxWidth: 397 }}
                 >
                     <TextField
                         required
@@ -137,10 +122,10 @@ export default function SignIn() {
                                 />
                             }
                             label="자동 로그인"
-                            slotProps={{ typography: { fontSize: '14px' } }}
+                            slotProps={{ typography: { fontSize: 14 } }}
                         />
                         <Link href="#">
-                            <Typography fontSize={'14px'}>
+                            <Typography fontSize={14}>
                                 {'비밀번호 찾기'}
                             </Typography>
                         </Link>
@@ -151,8 +136,8 @@ export default function SignIn() {
                         variant="contained"
                         sx={{
                             mt: 4,
-                            padding: '10px',
-                            fontSize: '16px',
+                            p: 1.5,
+                            fontSize: 16,
                             fontWeight: 500,
                         }}
                     >
@@ -164,8 +149,8 @@ export default function SignIn() {
                         variant="outlined"
                         sx={{
                             mt: 2,
-                            padding: '10px',
-                            fontSize: '16px',
+                            p: 1.5,
+                            fontSize: 16,
                             fontWeight: 500,
                         }}
                     >

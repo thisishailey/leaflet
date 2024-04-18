@@ -1,5 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react';
 import Snackbar from '@mui/material/Snackbar';
-import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
     snackbar: string;
