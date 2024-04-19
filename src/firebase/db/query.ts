@@ -9,11 +9,12 @@ import {
 import { firestore } from '../config';
 import {
     type ReviewData,
+    type PostData,
     COLLECTION_REVIEW,
     COLLECTION_USER,
     COLLECTION_POST,
 } from './model';
-import { getUserProfile } from './getData';
+import { type UserBasic, getUserProfile } from './getData';
 
 export const checkUsernameAvailability = cache(async (username: string) => {
     const q = query(
@@ -29,9 +30,42 @@ export const checkUsernameAvailability = cache(async (username: string) => {
     }
 });
 
+export interface Post {
+    id: string;
+    data: PostData;
+    writer: UserBasic;
+    match?: number;
+}
+
 export const getPosts = cache(async () => {
+    const result: Post[] = [];
+    let isEmpty: boolean = false;
+
     const querySnapshot = await getDocs(col(firestore, COLLECTION_POST));
-    return querySnapshot;
+
+    if (querySnapshot.empty) {
+        isEmpty = true;
+        return { result, isEmpty };
+    }
+
+    for (const doc of querySnapshot.docs) {
+        const postData = doc.data() as PostData;
+        const user = await getUserProfile(postData.email);
+
+        if (user.error) {
+            continue;
+        }
+
+        const post = {
+            id: doc.id,
+            data: postData,
+            writer: user.data as UserBasic,
+        };
+
+        result.push(post);
+    }
+
+    return { result, isEmpty };
 });
 
 export interface BookReview extends ReviewData {

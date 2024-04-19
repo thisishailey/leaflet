@@ -31,7 +31,12 @@ export default function Home() {
 
     return (
         <>
-            <Stack direction={'column'} alignItems={'center'} spacing={1}>
+            <Stack
+                direction={'column'}
+                alignItems={'center'}
+                spacing={1}
+                mb={10}
+            >
                 <SearchPost handleSearch={handleSearch} />
                 {writePost && <WritePost />}
                 <ViewPost search={search} />

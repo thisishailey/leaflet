@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
-import { type PostData } from '@/firebase/db/model';
+import { cache, useEffect, useState } from 'react';
+import { type Post, getPosts } from '@/firebase/db/query';
 import { PostPreview } from './post';
 import Typography from '@mui/material/Typography';
-import { getPosts } from '@/firebase/db/query';
-
-interface Post {
-    id: string;
-    data: PostData;
-    writer: UserBasic;
-    match?: number;
-}
 
 export default function ViewPost({ search }: { search: string[] }) {
     const [postsAll, setPostsAll] = useState<Post[]>([]);
@@ -24,36 +15,15 @@ export default function ViewPost({ search }: { search: string[] }) {
     const noSearchResultText = '검색 결과가 없습니다.';
 
     useEffect(() => {
-        const loadedPosts: Post[] = [];
+        const loadPost = cache(async () => {
+            const posts = await getPosts();
 
-        const loadPost = async () => {
-            const querySnapshot = await getPosts();
-
-            if (querySnapshot.empty) {
+            if (posts.isEmpty) {
                 return setNoPost(true);
             }
 
-            setNoPost(false);
-
-            for (const doc of querySnapshot.docs) {
-                const postData = doc.data() as PostData;
-                const user = await getUserProfile(postData.email);
-
-                if (user.error) {
-                    return;
-                }
-
-                const newPost = {
-                    id: doc.id,
-                    data: postData,
-                    writer: user.data as UserBasic,
-                };
-
-                loadedPosts.push(newPost);
-            }
-
-            setPostsAll(loadedPosts);
-        };
+            setPostsAll(posts.result);
+        });
 
         loadPost();
     }, []);
