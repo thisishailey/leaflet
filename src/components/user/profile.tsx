@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import getData from '@/firebase/db/getData';
+import {getData} from '@/firebase/db/getData';
 import { COLLECTION_USER, type UserData } from '@/firebase/db/model';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';

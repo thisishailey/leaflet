@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
 
     const res = await fetch(`${ENDPOINT}?query=${query}&display=5`, {
         headers,
+        cache: 'force-cache',
     });
     const data: RegionSearchResult = await res.json();
 

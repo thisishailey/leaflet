@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { firestore } from '@/firebase/config';
-import { collection as col, getDocs } from 'firebase/firestore';
 import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
-import { type PostData, COLLECTION_POST } from '@/firebase/db/model';
+import { type PostData } from '@/firebase/db/model';
 import { PostPreview } from './post';
 import Typography from '@mui/material/Typography';
+import { getPosts } from '@/firebase/db/query';
 
 interface Post {
     id: string;
@@ -20,7 +19,7 @@ export default function ViewPost({ search }: { search: string[] }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [noPost, setNoPost] = useState(false);
     const [noSearchResult, setNoSearchResult] = useState(false);
-	
+
     const noPostText = '리프가 없습니다.';
     const noSearchResultText = '검색 결과가 없습니다.';
 
@@ -28,9 +27,7 @@ export default function ViewPost({ search }: { search: string[] }) {
         const loadedPosts: Post[] = [];
 
         const loadPost = async () => {
-            const querySnapshot = await getDocs(
-                col(firestore, COLLECTION_POST)
-            );
+            const querySnapshot = await getPosts();
 
             if (querySnapshot.empty) {
                 return setNoPost(true);

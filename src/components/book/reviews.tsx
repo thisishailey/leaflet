@@ -4,12 +4,8 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import { useAuthContext } from '@/firebase/auth/state';
 import type { User } from 'firebase/auth';
 import addData from '@/firebase/db/addData';
-import {
-    type BookReview,
-    type UserBasic,
-    getReviews,
-    getUserProfile,
-} from '@/firebase/db/getData';
+import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
+import { type BookReview, getReviews } from '@/firebase/db/query';
 import { type ReviewData, COLLECTION_REVIEW } from '@/firebase/db/model';
 
 import Avatar from '@mui/material/Avatar';

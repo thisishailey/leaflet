@@ -23,10 +23,8 @@ export default function SearchBook() {
             return setOptions([]);
         }
 
-        const header = new Headers({ search: encodeURIComponent(value) });
-        const res = await fetch('/api/books/searchByTerm', {
-            headers: header,
-        });
+        const headers = new Headers({ search: encodeURIComponent(value) });
+        const res = await fetch('/api/books/searchByTerm', { headers });
 
         const data: BookSearchItemData = await res.json();
         const items: BookItem[] = data.item;

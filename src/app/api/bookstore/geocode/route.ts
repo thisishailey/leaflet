@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 
     const res = await fetch(`${ENDPOINT}?query=${query}`, {
         headers,
+        cache: 'force-cache',
     });
     const data: GeocodeResult = await res.json();
 

@@ -18,7 +18,7 @@ export default function NaverMap({ address }: { address: string }) {
 
     useEffect(() => {
         const setMarker = async () => {
-            const headers = new Headers({ query: encodeURI(address) });
+            const headers = new Headers({ query: encodeURIComponent(address) });
             const res = await fetch('api/bookstore/geocode', { headers });
             const data: GeocodeResult = await res.json();
 

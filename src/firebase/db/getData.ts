@@ -1,29 +1,20 @@
+import { cache } from 'react';
 import { firestore } from '../config';
-import {
-    Timestamp,
-    doc,
-    getDoc,
-    collection as col,
-    query,
-    where,
-    getDocs,
-} from 'firebase/firestore';
+import { Timestamp, doc, getDoc } from 'firebase/firestore';
 import getFile from '../storage/getFile';
 import { getElapsedTime } from '@/util/datetime';
 import {
-    COLLECTION_COMMENT,
-    COLLECTION_POST,
-    COLLECTION_USER,
     type CommentData,
     type PostData,
     type UserData,
     type Collection,
     type Data,
-    COLLECTION_REVIEW,
-    ReviewData,
+    COLLECTION_COMMENT,
+    COLLECTION_POST,
+    COLLECTION_USER,
 } from './model';
 
-export default async function getData(collection: Collection, id: string) {
+export const getData = cache(async (collection: Collection, id: string) => {
     let result: Data | null = null,
         error: string | null = null;
 
@@ -36,7 +27,7 @@ export default async function getData(collection: Collection, id: string) {
     }
 
     return { result, error };
-}
+});
 
 export interface UserBasic {
     email: string;
@@ -44,7 +35,7 @@ export interface UserBasic {
     profileSrc: string;
 }
 
-export async function getUserProfile(email: string) {
+export const getUserProfile = cache(async (email: string) => {
     let data: UserBasic | null = null,
         error: string | null = null;
 
@@ -72,7 +63,7 @@ export async function getUserProfile(email: string) {
     };
 
     return { data, error };
-}
+});
 
 export interface CurrentUserPost {
     email: string;
@@ -82,44 +73,46 @@ export interface CurrentUserPost {
     bookmark: boolean;
 }
 
-export async function getCurrentUserOnPost(email: string, postId: string) {
-    let data: CurrentUserPost | null = null,
-        error: string | null = null;
+export const getCurrentUserOnPost = cache(
+    async (email: string, postId: string) => {
+        let data: CurrentUserPost | null = null,
+            error: string | null = null;
 
-    const docSnap = await getDoc(doc(firestore, COLLECTION_USER, email));
+        const docSnap = await getDoc(doc(firestore, COLLECTION_USER, email));
 
-    if (!docSnap.exists()) {
-        error = 'requested data does not exist';
+        if (!docSnap.exists()) {
+            error = 'requested data does not exist';
+            return { data, error };
+        }
+
+        const userData = docSnap.data() as UserData;
+
+        let src = '';
+        if (userData.profileImg) {
+            const { result } = await getFile(userData.profileImg);
+            if (result) {
+                src = result;
+            }
+        }
+
+        const isLiked = userData.like?.includes(postId) || false;
+        const isBookmarked = userData.bookmark?.includes(postId) || false;
+
+        data = {
+            email: userData.email,
+            username: userData.username,
+            profileSrc: src,
+            like: isLiked,
+            bookmark: isBookmarked,
+        };
+
         return { data, error };
     }
-
-    const userData = docSnap.data() as UserData;
-
-    let src = '';
-    if (userData.profileImg) {
-        const { result } = await getFile(userData.profileImg);
-        if (result) {
-            src = result;
-        }
-    }
-
-    const isLiked = userData.like?.includes(postId) || false;
-    const isBookmarked = userData.bookmark?.includes(postId) || false;
-
-    data = {
-        email: userData.email,
-        username: userData.username,
-        profileSrc: src,
-        like: isLiked,
-        bookmark: isBookmarked,
-    };
-
-    return { data, error };
-}
+);
 
 export type CommentDetail = CommentData & UserBasic & { elapsedTime: string };
 
-export async function getComments(commentIds: string[]) {
+export const getComments = cache(async (commentIds: string[]) => {
     const data: CommentDetail[] = [];
 
     for (const commentId of commentIds) {
@@ -150,7 +143,7 @@ export async function getComments(commentIds: string[]) {
     }
 
     return data;
-}
+});
 
 export interface PostDetail extends UserBasic {
     content: string;
@@ -160,7 +153,7 @@ export interface PostDetail extends UserBasic {
     comments: CommentDetail[];
 }
 
-export async function getPost(postId: string) {
+export const getPost = cache(async (postId: string) => {
     let data: PostDetail | null = null,
         error: string | null = null;
 
@@ -205,45 +198,4 @@ export async function getPost(postId: string) {
     };
 
     return { data, error };
-}
-
-export interface BookReview extends ReviewData {
-    username?: string;
-    profileSrc?: string;
-    date: string;
-}
-
-export async function getReviews(isbn: string) {
-    const data: BookReview[] = [];
-
-    const q = query(
-        col(firestore, COLLECTION_REVIEW),
-        where('isbn', '==', isbn)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-        return data;
-    }
-
-    for (const doc of querySnapshot.docs) {
-        const reviewData = doc.data() as ReviewData;
-        const user = await getUserProfile(reviewData.email);
-
-        const timestamp = (reviewData.timestamp as Timestamp).toDate();
-        const date = `${timestamp.getFullYear()}/${
-            timestamp.getMonth() + 1
-        }/${timestamp.getDate()}`;
-
-        const review: BookReview = {
-            ...reviewData,
-            ...user.data,
-            date,
-        };
-
-        data.push(review);
-    }
-
-    return data;
-}
+});

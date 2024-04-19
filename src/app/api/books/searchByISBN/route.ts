@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     const res = await fetch(ENDPOINT, {
         body: params,
         method: 'post',
+        cache: 'force-cache',
     });
     const data: BookSearchItemData = await res.json();
 
