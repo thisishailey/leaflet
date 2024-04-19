@@ -12,6 +12,8 @@ export type UpdatableData = UserDataUpdate | PostDataUpdate | CommentDataUpdate;
 export type UserCollection = 'user';
 export const COLLECTION_USER: UserCollection = 'user';
 
+export type Providers = 'leaflet' | 'google';
+
 export interface UserData {
     email: string; // primary key, no update
     username: string; // unique
@@ -24,6 +26,7 @@ export interface UserData {
     wishlist?: string[];
     like?: string[];
     bookmark?: string[];
+    provider?: Providers;
     timestamp?: Timestamp; // automatic, no update
 }
 
@@ -84,7 +87,7 @@ export interface ReviewData {
     _id?: string; // primary key, automatic, no update
     isbn: string; // foreign key (book), no update
     email: string; // foreign key (user), no update
-	anonymous: boolean;
+    anonymous: boolean;
     rating: number;
     content: string;
     timestamp?: Timestamp; // automatic, no update

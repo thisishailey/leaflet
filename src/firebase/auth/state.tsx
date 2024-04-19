@@ -4,9 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../config';
 import { User, onAuthStateChanged } from 'firebase/auth';
 
-type UserState = User | null;
-
-const AuthContext = createContext<{ user: UserState; loading: boolean }>({
+const AuthContext = createContext<{ user: User | null; loading: boolean }>({
     user: null,
     loading: true,
 });
@@ -17,7 +15,7 @@ export default function AuthContextProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [user, setUser] = useState<UserState>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {

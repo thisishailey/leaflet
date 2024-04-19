@@ -5,13 +5,13 @@ import {
     experimental_extendTheme as extendTheme,
     useColorScheme,
 } from '@mui/material/styles';
-import { noto_sans } from '@/styles/font';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import NightlightIcon from '@mui/icons-material/Nightlight';
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
+import { noto_sans } from './font';
 
 const COLOR = {
     WHITE: '#fafafa',
