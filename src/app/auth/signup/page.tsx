@@ -8,6 +8,9 @@ import updateData from '@/firebase/db/updateData';
 import uploadFile from '@/firebase/storage/uploadFile';
 import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { type UserDataUpdate, COLLECTION_USER } from '@/firebase/db/model';
+import { checkUsernameAvailability } from '@/firebase/db/query';
+import { useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil';
+import { signUpStepState, socialSignUpState } from '@/state/signUpState';
 
 import { CopyrightShort } from '@/components/common/copyright';
 import Alert from '@mui/material/Alert';
@@ -27,7 +30,6 @@ import Stepper from '@mui/material/Stepper';
 import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { checkUsernameAvailability } from '@/firebase/db/query';
 
 interface PasswordVisibility {
     password: boolean;
@@ -40,16 +42,16 @@ interface RePasswordState {
     error: boolean;
 }
 
+interface UsernameState {
+    helper: string;
+    error: boolean;
+}
+
 interface UserDataState {
     email: string;
     password: string;
     username: string;
     imagePreviewUrl: string;
-}
-
-interface UsernameState {
-    helper: string;
-    error: boolean;
 }
 
 const steps: string[] = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
@@ -58,12 +60,14 @@ const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
 
 export default function SignUp() {
     const { replace } = useRouter();
+    const [activeStep, setActiveStep] = useRecoilState(signUpStepState);
+    const socialSignUp = useRecoilValue(socialSignUpState);
+    const resetSocialSignUp = useResetRecoilState(socialSignUpState);
 
     const [alert, setAlert] = useState<string>('');
-    const [activeStep, setActiveStep] = useState(0);
-
     const [password, setPassword] = useState<string>('');
     const [passwordHelper, setPasswordHelper] = useState<string>('');
+
     const [showPassword, setShowPassword] = useState<PasswordVisibility>({
         password: false,
         rePassword: false,
@@ -79,7 +83,7 @@ export default function SignUp() {
         error: false,
     });
     const [userData, setUserData] = useState<UserDataState>({
-        email: '',
+        email: socialSignUp.isSocialSignUp ? socialSignUp.email : '',
         password: '',
         username: '',
         imagePreviewUrl: '',
@@ -104,7 +108,7 @@ export default function SignUp() {
 
     const handleNextStep = () => {
         setAlert('');
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setActiveStep(activeStep + 1);
     };
 
     const handlePasswordChange = (
@@ -213,13 +217,15 @@ export default function SignUp() {
         const firstname = data.get('firstname') as string;
         const lastname = data.get('lastname') as string;
 
-        const authResult = await authSignUp({
-            email: userData.email,
-            password: userData.password,
-        });
+        if (!socialSignUp.isSocialSignUp) {
+            const authResult = await authSignUp({
+                email: userData.email,
+                password: userData.password,
+            });
 
-        if (authResult.error) {
-            return setAlert(authResult.error.message);
+            if (authResult.error) {
+                return setAlert(authResult.error.message);
+            }
         }
 
         const dbResult = await addData(
@@ -238,6 +244,7 @@ export default function SignUp() {
         }
 
         setUserData((prev) => ({ ...prev, username }));
+        resetSocialSignUp();
         handleNextStep();
     };
 
@@ -251,8 +258,8 @@ export default function SignUp() {
     };
 
     const handleStepThree = async (data: FormData) => {
-        const image = data.get('image') as File;
-        const bio = data.get('bio') as string;
+        const image = data.get('image');
+        const bio = data.get('bio');
 
         if (!image && !bio) {
             return;
@@ -260,7 +267,10 @@ export default function SignUp() {
 
         let newData: UserDataUpdate = {};
         if (image) {
-            const { error, imageUrl } = await uploadFile(PROFILE_IMAGE, image);
+            const { error, imageUrl } = await uploadFile(
+                PROFILE_IMAGE,
+                image as File
+            );
 
             if (error) {
                 return setAlert(error.message);
@@ -269,7 +279,7 @@ export default function SignUp() {
             newData = { profileImg: imageUrl };
         }
         if (bio) {
-            newData = { ...newData, bio };
+            newData = { ...newData, bio: bio as string };
         }
 
         const { error } = await updateData('user', userData.email, newData);
@@ -278,7 +288,7 @@ export default function SignUp() {
             return setAlert(error.message);
         }
 
-        setAlert('');
+        setActiveStep(0);
         replace('/user');
     };
 
@@ -290,9 +300,18 @@ export default function SignUp() {
             <CustomAlert alert={alert} setAlert={setAlert} />
             <Alert
                 severity="info"
-                sx={{ display: activeStep === 2 ? 'flex' : 'none' }}
+                sx={{
+                    display:
+                        activeStep === 2
+                            ? 'flex'
+                            : socialSignUp.isSocialSignUp
+                            ? 'flex'
+                            : 'none',
+                }}
             >
-                {'필수 항목이 아닙니다.'}
+                {activeStep === 2
+                    ? `필수 항목이 아닙니다. 작성을 원치 않으시면 바로 완료를 눌러주세요.`
+                    : `${socialSignUp.provider} 계정으로 회원가입을 완료하시려면, 아래 항목을 입력해 주세요.`}
             </Alert>
             <Stack
                 direction={'column'}

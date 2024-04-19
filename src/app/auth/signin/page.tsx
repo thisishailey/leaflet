@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { User } from 'firebase/auth';
 import { passwordSignIn, googleSignIn } from '@/firebase/auth/signin';
+import { useSetRecoilState } from 'recoil';
+import { signUpStepState, socialSignUpState } from '@/state/signUpState';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -27,6 +29,8 @@ export default function SignIn() {
     const { replace } = useRouter();
     const [alert, setAlert] = useState<string>('');
     const [showPassword, setShowPassword] = useState(false);
+    const setSignUpStep = useSetRecoilState(signUpStepState);
+    const setSocialSignUp = useSetRecoilState(socialSignUpState);
 
     const handleTogglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -55,10 +59,18 @@ export default function SignIn() {
             return setAlert(result.error.message);
         }
 
-        const user: User = result.data!.user!;
+        if (result.isNew) {
+            const user: User = result.data!.user!;
+            const provider = 'Google';
+            const email = user.email as string;
 
-        const email = user.email as string;
-        const provider = 'google';
+            setSignUpStep(1);
+            setSocialSignUp({ isSocialSignUp: true, provider, email });
+
+            return replace('/auth/signup');
+        }
+
+        return replace('/user/following');
     };
 
     return (

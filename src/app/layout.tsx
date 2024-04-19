@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import CssBaseline from '@mui/material/CssBaseline';
+import AuthContextProvider from '@/firebase/auth/state';
+import RecoilProvider from '@/state/recoil';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import CssBaseline from '@mui/material/CssBaseline';
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { theme } from '@/styles/theme';
-import AuthContextProvider from '@/firebase/auth/state';
 import Wrapper from '@/components/common/wrapper';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
@@ -32,11 +33,13 @@ export default function RootLayout({
                         />
                     </head>
                     <body>
-                        <AuthContextProvider>
-                            <Header />
-                            <Wrapper>{children}</Wrapper>
-                            <Footer />
-                        </AuthContextProvider>
+                        <RecoilProvider>
+                            <AuthContextProvider>
+                                <Header />
+                                <Wrapper>{children}</Wrapper>
+                                <Footer />
+                            </AuthContextProvider>
+                        </RecoilProvider>
                     </body>
                 </html>
             </CssVarsProvider>
