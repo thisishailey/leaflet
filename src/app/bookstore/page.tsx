@@ -48,118 +48,126 @@ export default function Bookstore() {
     };
 
     return (
-        <Stack direction={'column'} spacing={2}>
+        <>
             <CustomAlert alert={alert} setAlert={setAlert} />
-            <Modal
-                open={openModal}
-                onClose={() => {
-                    setOpenModal(false);
-                    setMarker('');
-                }}
-            >
-                <Box
-                    position={'relative'}
-                    top={'50%'}
-                    left={'50%'}
-                    sx={{ transform: 'translate(-50%, -50%)' }}
-                    width={{ xs: '90%', sm: '70%', md: '60%', lg: '50%' }}
-                    height={{ xs: '60%', md: '50%' }}
+            <Stack direction={'column'} spacing={2}>
+                <Modal
+                    open={openModal}
+                    onClose={() => {
+                        setOpenModal(false);
+                        setMarker('');
+                    }}
                 >
-                    <NaverMap address={marker} />
-                </Box>
-            </Modal>
-            <ToggleButtonGroup
-                exclusive
-                value={place}
-                onChange={(event, value) => setPlace(value)}
-                color="primary"
-                sx={{ width: 300, alignSelf: 'center' }}
-            >
-                {places.map((place) => (
-                    <ToggleButton key={place} value={place} fullWidth>
-                        {place}
-                    </ToggleButton>
-                ))}
-            </ToggleButtonGroup>
-            <Stack
-                direction={'row'}
-                spacing={2}
-                component={'form'}
-                onSubmit={handleSearch}
-            >
-                <TextField
-                    required
-                    fullWidth
-                    autoComplete="off"
-                    name="region"
-                    placeholder="키워드나 지역 이름을 입력해 주세요."
-                />
-                <Button type="submit" variant="contained">
-                    {'검색'}
-                </Button>
-            </Stack>
-            <Stack direction={'column'} spacing={2} pt={2}>
-                {bookPlaces &&
-                    bookPlaces.map((place) => (
-                        <Paper
-                            key={place.address}
-                            elevation={4}
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
-                                p: 3,
-                            }}
-                        >
-                            <Stack
-                                direction={'row'}
-                                alignItems={'center'}
-                                spacing={1}
-                            >
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: place.title,
-                                    }}
-                                    style={{ fontSize: '18px' }}
-                                ></div>
-                                <Tooltip title="지도 보기" placement="right">
-                                    <IconButton
-                                        onClick={() => {
-                                            setMarker(place.address);
-                                            setOpenModal(true);
-                                        }}
-                                    >
-                                        <MapIcon color="primary" />
-                                    </IconButton>
-                                </Tooltip>
-                            </Stack>
-                            <Stack
-                                direction={{ xs: 'column', md: 'row' }}
-                                spacing={{ xs: 0.5, md: 2 }}
-                                divider={
-                                    <Divider orientation="vertical" flexItem />
-                                }
-                            >
-                                <Typography fontSize={14}>
-                                    {place.roadAddress}
-                                </Typography>
-                                <Typography fontSize={14}>
-                                    {place.category}
-                                </Typography>
-                                {place.link && (
-                                    <Link href={place.link}>
-                                        <Typography
-                                            fontSize={14}
-                                            color={'primary.main'}
-                                        >
-                                            {'홈페이지'}
-                                        </Typography>
-                                    </Link>
-                                )}
-                            </Stack>
-                        </Paper>
+                    <Box
+                        position={'relative'}
+                        top={'50%'}
+                        left={'50%'}
+                        sx={{ transform: 'translate(-50%, -50%)' }}
+                        width={{ xs: '90%', sm: '70%', md: '60%', lg: '50%' }}
+                        height={{ xs: '60%', md: '50%' }}
+                    >
+                        <NaverMap address={marker} />
+                    </Box>
+                </Modal>
+                <ToggleButtonGroup
+                    exclusive
+                    value={place}
+                    onChange={(event, value) => setPlace(value)}
+                    color="primary"
+                    sx={{ width: 300, alignSelf: 'center' }}
+                >
+                    {places.map((place) => (
+                        <ToggleButton key={place} value={place} fullWidth>
+                            {place}
+                        </ToggleButton>
                     ))}
+                </ToggleButtonGroup>
+                <Stack
+                    direction={'row'}
+                    spacing={2}
+                    component={'form'}
+                    onSubmit={handleSearch}
+                >
+                    <TextField
+                        required
+                        fullWidth
+                        autoComplete="off"
+                        name="region"
+                        placeholder="키워드나 지역 이름을 입력해 주세요."
+                    />
+                    <Button type="submit" variant="contained">
+                        {'검색'}
+                    </Button>
+                </Stack>
+                <Stack direction={'column'} spacing={2} pt={2}>
+                    {bookPlaces &&
+                        bookPlaces.map((place) => (
+                            <Paper
+                                key={place.address}
+                                elevation={4}
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 2,
+                                    p: 3,
+                                }}
+                            >
+                                <Stack
+                                    direction={'row'}
+                                    alignItems={'center'}
+                                    spacing={1}
+                                >
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: place.title,
+                                        }}
+                                        style={{ fontSize: '18px' }}
+                                    ></div>
+                                    <Tooltip
+                                        title="지도 보기"
+                                        placement="right"
+                                    >
+                                        <IconButton
+                                            onClick={() => {
+                                                setMarker(place.address);
+                                                setOpenModal(true);
+                                            }}
+                                        >
+                                            <MapIcon color="primary" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Stack>
+                                <Stack
+                                    direction={{ xs: 'column', md: 'row' }}
+                                    spacing={{ xs: 0.5, md: 2 }}
+                                    divider={
+                                        <Divider
+                                            orientation="vertical"
+                                            flexItem
+                                        />
+                                    }
+                                >
+                                    <Typography fontSize={14}>
+                                        {place.roadAddress}
+                                    </Typography>
+                                    <Typography fontSize={14}>
+                                        {place.category}
+                                    </Typography>
+                                    {place.link && (
+                                        <Link href={place.link}>
+                                            <Typography
+                                                fontSize={14}
+                                                color={'primary.main'}
+                                            >
+                                                {'홈페이지'}
+                                            </Typography>
+                                        </Link>
+                                    )}
+                                </Stack>
+                            </Paper>
+                        ))}
+                </Stack>
             </Stack>
-        </Stack>
+        </>
     );
 }

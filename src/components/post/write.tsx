@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useAuthContext } from '@/firebase/auth/state';
 import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
 import addData from '@/firebase/db/addData';
@@ -16,8 +15,11 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import SignInBanner from '../common/signinBanner';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
@@ -25,8 +27,8 @@ import Typography from '@mui/material/Typography';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatClearIcon from '@mui/icons-material/FormatClear';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import RedoIcon from '@mui/icons-material/Redo';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
 import UndoIcon from '@mui/icons-material/Undo';
 
@@ -34,10 +36,17 @@ import { useEditor, EditorContent, BubbleMenu, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
+import Tooltip from '@mui/material/Tooltip';
+import AddIcon from '@mui/icons-material/Add';
+import IconButton from '@mui/material/IconButton';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 
 export default function WritePost() {
     const CHAR_LIMIT = 500;
     const { user, loading } = useAuthContext();
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
     const [alert, setAlert] = useState<string>('');
     const [complete, setComplete] = useState<string>('');
@@ -99,10 +108,16 @@ export default function WritePost() {
     ];
     const toolOptions = [
         {
-            name: '되돌리기',
+            name: '실행취소',
             command: 'undo',
             icon: <UndoIcon />,
             onclick: () => editor.commands.undo(),
+        },
+        {
+            name: '다시실행',
+            command: 'redo',
+            icon: <RedoIcon />,
+            onclick: () => editor.commands.redo(),
         },
         {
             name: '모두선택',
@@ -115,12 +130,6 @@ export default function WritePost() {
             command: 'image',
             icon: <InsertPhotoIcon />,
         },
-        {
-            name: '링크',
-            command: 'link',
-            icon: <InsertLinkIcon />,
-            onclick: () => {},
-        },
     ];
 
     const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,6 +141,7 @@ export default function WritePost() {
             const url = URL.createObjectURL(image);
             setImagePreviewUrl(imagePreviewUrl.concat(url));
         }
+        setMenuAnchor(null);
     };
 
     const handleOpenPreview = (url: string) => {
@@ -207,176 +217,115 @@ export default function WritePost() {
                     </Backdrop>
                     <Paper
                         variant="outlined"
-                        sx={{ width: '100%', maxWidth: 900, borderRadius: 4 }}
+                        sx={{ width: '100%', maxWidth: 976 }}
                     >
                         <Stack
                             direction={{ xs: 'column', sm: 'row' }}
-                            spacing={{ xs: 0, sm: 1 }}
+                            spacing={{ xs: 1, sm: 2 }}
                             width={'100%'}
-                            p={1.5}
+                            p={{ xs: 1, sm: 2 }}
                         >
-                            <Paper
-                                variant="outlined"
-                                sx={{ width: '100%', borderRadius: 3 }}
-                            >
-                                <Stack
-                                    direction={'row'}
-                                    spacing={0.5}
+                            <Stack direction={'column'} width={'100%'}>
+                                <Box
+                                    id={'editor'}
                                     width={'100%'}
-                                    p={0.5}
+                                    minHeight={100}
+                                    height={'100%'}
+                                    p={1}
+                                    onClick={() => editor.commands.focus()}
                                 >
-                                    <Box
-                                        id={'editor'}
-                                        width={'100%'}
-                                        minHeight={100}
-                                        p={1}
-                                        onClick={() => editor.commands.focus()}
-                                    >
-                                        {editor?.isEmpty &&
-                                            !editor?.isFocused && (
-                                                <Box
-                                                    component={'span'}
-                                                    position={'absolute'}
-                                                    color={'primary.light'}
-                                                >
-                                                    {'리프를 작성해 보세요 🌿'}
-                                                </Box>
-                                            )}
-                                        <EditorContent editor={editor} />
-                                        {editor && (
-                                            <BubbleMenu
-                                                editor={editor}
-                                                tippyOptions={{ duration: 100 }}
-                                            >
-                                                <ToggleButtonGroup aria-label="text formatting">
-                                                    {formatOptions.map(
-                                                        (option) => (
-                                                            <ToggleButton
-                                                                sx={{
-                                                                    p: 1,
-                                                                    bgcolor:
-                                                                        'secondary.main',
-                                                                    '&:hover': {
-                                                                        bgcolor:
-                                                                            'secondary.dark',
-                                                                    },
-                                                                }}
-                                                                key={
-                                                                    option.command
-                                                                }
-                                                                value={
-                                                                    option.command
-                                                                }
-                                                                onClick={
-                                                                    option.onclick
-                                                                }
-                                                                className={
-                                                                    editor.isActive(
-                                                                        option.command
-                                                                    )
-                                                                        ? 'is-active'
-                                                                        : ''
-                                                                }
-                                                            >
-                                                                {option.icon}
-                                                            </ToggleButton>
-                                                        )
-                                                    )}
-                                                </ToggleButtonGroup>
-                                            </BubbleMenu>
-                                        )}
-                                    </Box>
-                                    <ToggleButtonGroup
-                                        size="small"
-                                        orientation={'vertical'}
-                                        aria-label="editor tools"
-                                    >
-                                        {toolOptions.map((option) =>
-                                            option.command !== 'image' ? (
-                                                <ToggleButton
-                                                    key={option.command}
-                                                    value={option.command}
-                                                    aria-label={option.command}
-                                                    onClick={option.onclick}
-                                                    sx={{ borderRadius: 2 }}
-                                                >
-                                                    {option.icon}
-                                                </ToggleButton>
-                                            ) : (
-                                                <ToggleButton
-                                                    key={option.command}
-                                                    value={option.command}
-                                                    aria-label={option.command}
-                                                    sx={{ borderRadius: 2 }}
-                                                >
-                                                    <Box
-                                                        component={'label'}
-                                                        htmlFor="image"
-                                                        width={24}
-                                                        height={24}
+                                    {editor?.isEmpty && !editor?.isFocused && (
+                                        <Box
+                                            component={'span'}
+                                            position={'absolute'}
+                                            color={'primary.light'}
+                                        >
+                                            {'리프를 작성해 보세요 🌿'}
+                                        </Box>
+                                    )}
+                                    <EditorContent editor={editor} />
+                                    {editor && (
+                                        <BubbleMenu
+                                            editor={editor}
+                                            tippyOptions={{ duration: 100 }}
+                                        >
+                                            <ToggleButtonGroup aria-label="text formatting">
+                                                {formatOptions.map((option) => (
+                                                    <ToggleButton
                                                         sx={{
-                                                            cursor: 'pointer',
+                                                            p: 1,
+                                                            bgcolor:
+                                                                'secondary.main',
+                                                            '&:hover': {
+                                                                bgcolor:
+                                                                    'secondary.dark',
+                                                            },
                                                         }}
+                                                        key={option.command}
+                                                        value={option.command}
+                                                        onClick={option.onclick}
+                                                        className={
+                                                            editor.isActive(
+                                                                option.command
+                                                            )
+                                                                ? 'is-active'
+                                                                : ''
+                                                        }
                                                     >
                                                         {option.icon}
-                                                        <input
-                                                            id="image"
-                                                            name="image"
-                                                            type="file"
-                                                            accept="image/*"
-                                                            hidden
-                                                            onChange={
-                                                                handleImage
-                                                            }
-                                                        />
-                                                    </Box>
-                                                </ToggleButton>
-                                            )
-                                        )}
-                                    </ToggleButtonGroup>
-                                </Stack>
-                                <Divider />
+                                                    </ToggleButton>
+                                                ))}
+                                            </ToggleButtonGroup>
+                                        </BubbleMenu>
+                                    )}
+                                </Box>
                                 <Stack
                                     direction={'row'}
+                                    alignItems={'center'}
                                     justifyContent={'space-between'}
-                                    p={1}
                                 >
-                                    <Box
-                                        fontSize={'14px'}
-                                        display={'flex'}
-                                        gap={1}
-                                    >
-                                        {!imagePreviewUrl
-                                            ? '사진 / 링크 프리뷰'
-                                            : imagePreviewUrl.map((url) => (
-                                                  <Avatar
-                                                      key={url}
-                                                      src={url}
-                                                      variant="rounded"
-                                                      sx={{
-                                                          width: 40,
-                                                          height: 40,
-                                                          cursor: 'pointer',
-                                                      }}
-                                                      onClick={() =>
-                                                          handleOpenPreview(url)
-                                                      }
-                                                  />
-                                              ))}
-                                    </Box>
+                                    <Stack direction={'row'}>
+                                        {imagePreviewUrl.length === 0 ? (
+                                            <Typography
+                                                ml={{ xs: 0, sm: 1 }}
+                                                fontSize={'14px'}
+                                            >
+                                                {
+                                                    '더하기 버튼으로 사진을 추가해 보세요!'
+                                                }
+                                            </Typography>
+                                        ) : (
+                                            imagePreviewUrl.map((url) => (
+                                                <Avatar
+                                                    key={url}
+                                                    src={url}
+                                                    variant="rounded"
+                                                    sx={{
+                                                        width: 30,
+                                                        height: 30,
+                                                        mx: 0.5,
+                                                        cursor: 'pointer',
+                                                    }}
+                                                    onClick={() =>
+                                                        handleOpenPreview(url)
+                                                    }
+                                                />
+                                            ))
+                                        )}
+                                    </Stack>
                                     <Typography fontSize={'14px'}>
                                         {`${
                                             editor?.storage.characterCount.characters() ||
                                             0
-                                        }/${CHAR_LIMIT} 자`}
+                                        } / ${CHAR_LIMIT} 자`}
                                     </Typography>
                                 </Stack>
-                            </Paper>
+                            </Stack>
                             <Stack
-                                direction={'column'}
-                                alignItems={{ xs: 'flex-end', sm: 'center' }}
+                                direction={{ xs: 'row', sm: 'column' }}
+                                alignItems={'center'}
                                 justifyContent={'space-between'}
-                                spacing={1}
+                                gap={1}
                             >
                                 <Avatar
                                     src={profile?.profileSrc}
@@ -386,10 +335,102 @@ export default function WritePost() {
                                 >
                                     {profile?.username.charAt(0)}
                                 </Avatar>
+                                <Box>
+                                    <Button
+                                        id="editor-button"
+                                        variant="outlined"
+                                        aria-controls={
+                                            Boolean(menuAnchor)
+                                                ? 'editor-menu'
+                                                : undefined
+                                        }
+                                        aria-haspopup="true"
+                                        aria-expanded={
+                                            Boolean(menuAnchor)
+                                                ? 'true'
+                                                : undefined
+                                        }
+                                        onClick={(
+                                            event: React.MouseEvent<HTMLButtonElement>
+                                        ) => setMenuAnchor(event.currentTarget)}
+                                    >
+                                        <AddIcon />
+                                    </Button>
+                                    <Menu
+                                        id="editor-menu"
+                                        anchorEl={menuAnchor}
+                                        open={Boolean(menuAnchor)}
+                                        onClose={() => setMenuAnchor(null)}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'editor-button',
+                                            disablePadding: true,
+                                            sx: {
+                                                display: 'flex',
+                                                p: 0.25,
+                                            },
+                                        }}
+                                        anchorOrigin={{
+                                            vertical: 'center',
+                                            horizontal: 'right',
+                                        }}
+                                        transformOrigin={{
+                                            vertical: 'center',
+                                            horizontal: 'left',
+                                        }}
+                                    >
+                                        {toolOptions.map((option) => (
+                                            <Tooltip
+                                                title={option.name}
+                                                placement="top"
+                                                key={option.command}
+                                            >
+                                                <MenuItem
+                                                    value={option.command}
+                                                    aria-label={option.command}
+                                                    disableGutters
+                                                    sx={{ p: 1 }}
+                                                    onClick={() => {
+                                                        if (option.onclick) {
+                                                            option.onclick();
+                                                            setMenuAnchor(null);
+                                                        }
+                                                    }}
+                                                >
+                                                    {option.command !==
+                                                    'image' ? (
+                                                        option.icon
+                                                    ) : (
+                                                        <Box
+                                                            component={'label'}
+                                                            htmlFor="image"
+                                                            width={24}
+                                                            height={24}
+                                                            sx={{
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            {option.icon}
+                                                            <input
+                                                                id="image"
+                                                                name="image"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                hidden
+                                                                onChange={
+                                                                    handleImage
+                                                                }
+                                                            />
+                                                        </Box>
+                                                    )}
+                                                </MenuItem>
+                                            </Tooltip>
+                                        ))}
+                                    </Menu>
+                                </Box>
                                 <Button
                                     variant="contained"
                                     onClick={handleSubmit}
-                                    sx={{ borderRadius: 4.5, fontWeight: 600 }}
+                                    sx={{ fontWeight: 600 }}
                                 >
                                     {'리프'}
                                 </Button>
@@ -409,8 +450,7 @@ export default function WritePost() {
                             severity={complete ? 'success' : 'error'}
                             sx={{
                                 width: '100%',
-                                maxWidth: 900,
-                                borderRadius: 2,
+                                maxWidth: 976,
                                 display: alert || complete ? 'flex' : 'none',
                             }}
                         >
@@ -420,39 +460,7 @@ export default function WritePost() {
                 </>
             )}
             {!loading && !user && (
-                <Paper
-                    variant="outlined"
-                    sx={{
-                        width: '100%',
-                        maxWidth: 900,
-                        p: 2,
-                        borderRadius: 4,
-                        bgcolor: 'primary.light',
-                    }}
-                >
-                    <Stack
-                        direction={'row'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        spacing={2}
-                    >
-                        <Link href={'/auth/signin'}>
-                            <Button
-                                size="large"
-                                color="secondary"
-                                variant="outlined"
-                            >
-                                {'로그인 / 회원가입'}
-                            </Button>
-                        </Link>
-                        <Typography
-                            color={'secondary.main'}
-                            display={{ xs: 'none', sm: 'block' }}
-                        >
-                            {'하고 리프를 작성해 보세요!'}
-                        </Typography>
-                    </Stack>
-                </Paper>
+                <SignInBanner nextAction={'하고 리프를 작성해 보세요!'} />
             )}
         </>
     );

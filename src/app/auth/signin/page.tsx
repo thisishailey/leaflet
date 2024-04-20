@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { User } from 'firebase/auth';
 import { passwordSignIn, googleSignIn } from '@/firebase/auth/signin';
@@ -26,7 +26,9 @@ import GoogleLogoIcon from '@/assets/social/google';
 import { roboto } from '@/styles/font';
 
 export default function SignIn() {
-    const { replace } = useRouter();
+    const { replace, back } = useRouter();
+    const searchParams = useSearchParams();
+
     const [alert, setAlert] = useState<string>('');
     const [showPassword, setShowPassword] = useState(false);
     const setSignUpStep = useSetRecoilState(signUpStepState);
@@ -49,7 +51,7 @@ export default function SignIn() {
             return setAlert(result.error.message);
         }
 
-        return replace('/user/following');
+        handleRedirectAfterCompletion();
     };
 
     const handleGoogleSignIn = async () => {
@@ -65,12 +67,21 @@ export default function SignIn() {
             const email = user.email as string;
 
             setSignUpStep(1);
-            setSocialSignUp({ isSocialSignUp: true, provider, email });
+            setSocialSignUp({ isSocialSignUp: true, provider, email, user });
 
             return replace('/auth/signup');
         }
 
-        return replace('/user/following');
+        handleRedirectAfterCompletion();
+    };
+
+    const handleRedirectAfterCompletion = () => {
+        const toBack = searchParams.get('back');
+        if (toBack) {
+            back();
+        } else {
+            replace('/user/following');
+        }
     };
 
     return (

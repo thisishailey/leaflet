@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import { type RecoilState, atom } from 'recoil';
 
 export const signUpStepState: RecoilState<number> = atom({
@@ -9,9 +10,14 @@ interface SocialSignUpState {
     isSocialSignUp: boolean;
     provider: string;
     email: string;
+    user?: User;
 }
 
 export const socialSignUpState: RecoilState<SocialSignUpState> = atom({
     key: 'SocialSignUpState',
-    default: { isSocialSignUp: Boolean(false), provider: '', email: '' },
+    default: {
+        isSocialSignUp: Boolean(false),
+        provider: '',
+        email: '',
+    },
 });

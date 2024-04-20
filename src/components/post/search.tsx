@@ -125,10 +125,6 @@ export default function SearchPost({ handleSearch }: Props) {
                 autoComplete="off"
                 fullWidth
                 InputProps={{
-                    sx: {
-                        borderRadius: 7,
-                        pl: 3,
-                    },
                     endAdornment: (
                         <InputAdornment position="end">
                             {searchValue.length > 0 && (

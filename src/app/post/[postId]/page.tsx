@@ -100,7 +100,7 @@ export default function Post({ params }: { params: { postId: string } }) {
     const needSignIn = (
         <>
             {'로그인이 필요합니다.'}
-            <Link href={'/auth/signin'}>
+            <Link href={{ pathname: '/auth/signin', query: { back: true } }}>
                 <Typography
                     component={'span'}
                     fontSize={13}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { User } from 'firebase/auth';
 import authSignUp from '@/firebase/auth/signup';
 import addData from '@/firebase/db/addData';
 import updateData from '@/firebase/db/updateData';
@@ -9,15 +10,16 @@ import uploadFile from '@/firebase/storage/uploadFile';
 import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { type UserDataUpdate, COLLECTION_USER } from '@/firebase/db/model';
 import { checkUsernameAvailability } from '@/firebase/db/query';
-import { useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { signUpStepState, socialSignUpState } from '@/state/signUpState';
+import { emptyValue } from '@/util/common';
 
-import { CopyrightShort } from '@/components/common/copyright';
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
+import { CopyrightShort } from '@/components/common/copyright';
 import CustomAlert from '@/components/common/alert';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
@@ -28,6 +30,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -62,9 +65,8 @@ export default function SignUp() {
     const { replace } = useRouter();
     const [activeStep, setActiveStep] = useRecoilState(signUpStepState);
     const socialSignUp = useRecoilValue(socialSignUpState);
-    const resetSocialSignUp = useResetRecoilState(socialSignUpState);
 
-    const [alert, setAlert] = useState<string>('');
+    const [alert, setAlert] = useState<React.ReactNode>('');
     const [password, setPassword] = useState<string>('');
     const [passwordHelper, setPasswordHelper] = useState<string>('');
 
@@ -82,12 +84,14 @@ export default function SignUp() {
         helper: '',
         error: false,
     });
-    const [userData, setUserData] = useState<UserDataState>({
+
+    const userDataDefault = {
         email: socialSignUp.isSocialSignUp ? socialSignUp.email : '',
         password: '',
         username: '',
         imagePreviewUrl: '',
-    });
+    };
+    const [userData, setUserData] = useState<UserDataState>(userDataDefault);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -174,7 +178,11 @@ export default function SignUp() {
         const rePassword = data.get('re-password') as string;
 
         if (password !== rePassword) {
-            return setAlert('비밀번호가 일치하지 않습니다.');
+            emptyValue('#password');
+            emptyValue('#re-password');
+            return setAlert(
+                '비밀번호가 일치하지 않습니다. 다시 시도해 주세요.'
+            );
         }
 
         setUserData((prev) => ({ ...prev, email, password }));
@@ -212,10 +220,33 @@ export default function SignUp() {
         setUsername({ helper, error });
     };
 
+    const restartSignUp = (
+        <>
+            {'오류가 발생했습니다. 처음부터 다시 시도해 주세요.'}
+            <Typography
+                component={'span'}
+                fontSize={13}
+                fontWeight={500}
+                ml={5}
+                onClick={() => {
+                    if (socialSignUp.isSocialSignUp) {
+                        replace('/auth/signin');
+                    } else {
+                        setActiveStep(0);
+                        setUserData(userDataDefault);
+                    }
+                }}
+            >
+                {'처음으로'}
+            </Typography>
+        </>
+    );
+
     const handleStepTwo = async (data: FormData) => {
-        const username = data.get('username') as string;
-        const firstname = data.get('firstname') as string;
-        const lastname = data.get('lastname') as string;
+        const username = data.get('username');
+        const firstname = data.get('firstname');
+        const lastname = data.get('lastname');
+        let user: User;
 
         if (!socialSignUp.isSocialSignUp) {
             const authResult = await authSignUp({
@@ -223,28 +254,37 @@ export default function SignUp() {
                 password: userData.password,
             });
 
-            if (authResult.error) {
-                return setAlert(authResult.error.message);
+            if (!authResult.result) {
+                return setAlert(restartSignUp);
             }
+
+            user = authResult.result.user;
+        } else {
+            user = socialSignUp.user as User;
+        }
+
+        if (!username || !firstname || !lastname) {
+            user.delete();
+            return setAlert(restartSignUp);
         }
 
         const dbResult = await addData(
             COLLECTION_USER,
             {
                 email: userData.email,
-                username,
-                firstname,
-                lastname,
+                username: username as string,
+                firstname: firstname as string,
+                lastname: lastname as string,
             },
             userData.email
         );
 
         if (dbResult.error) {
-            return setAlert(dbResult.error.message);
+            user.delete();
+            return setAlert(restartSignUp);
         }
 
-        setUserData((prev) => ({ ...prev, username }));
-        resetSocialSignUp();
+        setUserData((prev) => ({ ...prev, username: username as string }));
         handleNextStep();
     };
 
@@ -261,11 +301,8 @@ export default function SignUp() {
         const image = data.get('image');
         const bio = data.get('bio');
 
-        if (!image && !bio) {
-            return;
-        }
-
-        let newData: UserDataUpdate = {};
+        let newData: UserDataUpdate = {},
+            needUpdate: boolean = false;
         if (image) {
             const { error, imageUrl } = await uploadFile(
                 PROFILE_IMAGE,
@@ -273,22 +310,25 @@ export default function SignUp() {
             );
 
             if (error) {
-                return setAlert(error.message);
+                setAlert('프로필 사진을 업로드하지 못했습니다.');
+            } else {
+                newData = { profileImg: imageUrl };
+                needUpdate = true;
             }
-
-            newData = { profileImg: imageUrl };
         }
         if (bio) {
             newData = { ...newData, bio: bio as string };
+            needUpdate = true;
         }
 
-        const { error } = await updateData('user', userData.email, newData);
+        if (needUpdate) {
+            const { error } = await updateData('user', userData.email, newData);
 
-        if (error) {
-            return setAlert(error.message);
+            if (error) {
+                setAlert('프로필 사진 / 바이오를 업로드하지 못했습니다.');
+            }
         }
 
-        setActiveStep(0);
         replace('/user');
     };
 

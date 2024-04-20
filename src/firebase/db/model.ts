@@ -18,7 +18,7 @@ export interface UserData {
     email: string; // primary key, no update
     username: string; // unique
     firstname: string;
-    lastname: string;
+    lastname?: string;
     profileImg?: string; // unique
     bio?: string;
     follower?: string[];

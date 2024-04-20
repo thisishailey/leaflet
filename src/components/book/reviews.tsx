@@ -2,7 +2,6 @@
 
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import { useAuthContext } from '@/firebase/auth/state';
-import type { User } from 'firebase/auth';
 import addData from '@/firebase/db/addData';
 import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
 import { type BookReview, getReviews } from '@/firebase/db/query';
@@ -16,6 +15,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 import Rating from '@mui/material/Rating';
+import SignInBanner from '../common/signinBanner';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
@@ -41,12 +41,12 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
     const [anonymous, setAnonymous] = useState<boolean>(false);
 
     useEffect(() => {
-        if (typeof user === 'string') {
+        if (!user) {
             return;
         }
 
         const loadUser = async () => {
-            const result = await getUserProfile((user as User).email as string);
+            const result = await getUserProfile(user.email as string);
 
             if (!result.data) {
                 return setAlert('프로필 정보를 불러오지 못했습니다.');
@@ -177,7 +177,10 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                 </Box>
                 <Typography>{`리뷰 ${reviews.length}개`}</Typography>
             </Stack>
-            {!currentUserReview && (
+            {!currentUser && (
+                <SignInBanner nextAction={'하고 리뷰를 작성해 주세요.'} />
+            )}
+            {!currentUserReview && currentUser && (
                 <Paper
                     variant="outlined"
                     sx={{
@@ -200,7 +203,6 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                             }}
                             precision={0.5}
                             sx={{ color: 'primary.light' }}
-                            disabled={Boolean(!currentUser)}
                         />
                         <TextField
                             name="review"
@@ -208,12 +210,7 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                             fullWidth
                             multiline
                             rows={3}
-                            disabled={Boolean(!currentUser)}
-                            placeholder={
-                                Boolean(!currentUser)
-                                    ? '로그인 후 리뷰를 작성해 주세요.'
-                                    : '리뷰를 작성해 주세요.'
-                            }
+                            placeholder={'리뷰를 작성해 주세요.'}
                         />
                     </Box>
                     <Stack
@@ -222,17 +219,16 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                         justifyContent={'space-between'}
                     >
                         <Avatar
-                            src={anonymous ? '' : currentUser?.profileSrc}
-                            alt={currentUser?.username}
+                            src={anonymous ? '' : currentUser.profileSrc}
+                            alt={currentUser.username}
                         >
-                            {anonymous ? '' : currentUser?.username.charAt(0)}
+                            {anonymous ? '' : currentUser.username.charAt(0)}
                         </Avatar>
                         <FormControlLabel
                             control={
                                 <Switch
                                     name="anonymous"
                                     onChange={handleAnonymousChange}
-                                    disabled={Boolean(!currentUser)}
                                 />
                             }
                             label="익명"
@@ -250,7 +246,6 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                             sx={{
                                 minWidth: 90,
                             }}
-                            disabled={Boolean(!currentUser)}
                         >
                             {'리뷰 쓰기'}
                         </Button>
