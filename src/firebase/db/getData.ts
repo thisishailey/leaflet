@@ -29,6 +29,43 @@ export const getData = cache(async (collection: Collection, id: string) => {
     return { result, error };
 });
 
+export interface UserProfile extends UserData {}
+
+export const getProfileSrc = cache(async (profileImg: string) => {
+    const { result } = await getFile(profileImg);
+    return result;
+});
+
+export const getUserProfileAll = cache(async (email: string) => {
+    let data: UserBasic | null = null,
+        error: string | null = null;
+
+    const docSnap = await getDoc(doc(firestore, COLLECTION_USER, email));
+
+    if (!docSnap.exists()) {
+        error = 'requested data does not exist';
+        return { data, error };
+    }
+
+    const userData = docSnap.data() as UserData;
+
+    let src = '';
+    if (userData.profileImg) {
+        const { result } = await getFile(userData.profileImg);
+        if (result) {
+            src = result;
+        }
+    }
+
+    data = {
+        email: userData.email,
+        username: userData.username,
+        profileSrc: src,
+    };
+
+    return { data, error };
+});
+
 export interface UserBasic {
     email: string;
     username: string;

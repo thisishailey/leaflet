@@ -197,6 +197,8 @@ export default function SignIn() {
                     sx={{
                         display: 'flex',
                         gap: 1.5,
+                        width: '100%',
+                        maxWidth: 397,
                         py: 1.5,
                         px: 2,
                         bgcolor: '#ffffff',

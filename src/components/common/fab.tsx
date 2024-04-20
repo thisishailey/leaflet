@@ -9,8 +9,8 @@ import Fab from '@mui/material/Fab';
 import Popover from '@mui/material/Popover';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import SettingsIcon from '@mui/icons-material/Settings';
-import VerticalAlignTopRoundedIcon from '@mui/icons-material/VerticalAlignTopRounded';
 
 export default function BottomActionButtons() {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -43,7 +43,7 @@ export default function BottomActionButtons() {
                         }}
                         aria-label="scroll back to top"
                     >
-                        <VerticalAlignTopRoundedIcon />
+                        <KeyboardArrowUpIcon />
                     </Fab>
                 </Tooltip>
                 <Tooltip title="환경설정" placement="top">
