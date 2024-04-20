@@ -1,3 +1,9 @@
+import ToBeUpdated from '@/components/common/tbu';
+
 export default function Message() {
-    return <div>{'Message Page'}</div>;
+    return (
+        <>
+            <ToBeUpdated />
+        </>
+    );
 }

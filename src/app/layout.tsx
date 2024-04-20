@@ -9,8 +9,8 @@ import { theme } from '@/styles/theme';
 import Wrapper from '@/components/common/wrapper';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
+import Loading from '@/components/common/loading';
 import favicon from '@/assets/favicon/favicon.ico';
-import Box from '@mui/material/Box';
 
 export const metadata: Metadata = {
     title: 'Leaflet',
@@ -37,7 +37,7 @@ export default function RootLayout({
                     <body>
                         <RecoilProvider>
                             <AuthContextProvider>
-                                <Suspense fallback={<Box>{'Loading...'}</Box>}>
+                                <Suspense fallback={<Loading />}>
                                     <Header />
                                     <Wrapper>{children}</Wrapper>
                                 </Suspense>
