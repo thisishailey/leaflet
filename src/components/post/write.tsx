@@ -13,17 +13,16 @@ import Avatar from '@mui/material/Avatar';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import SignInBanner from '../common/signinBanner';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
+import AddIcon from '@mui/icons-material/Add';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatClearIcon from '@mui/icons-material/FormatClear';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
@@ -36,21 +35,15 @@ import { useEditor, EditorContent, BubbleMenu, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
-import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
-import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
-import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 
 export default function WritePost() {
     const CHAR_LIMIT = 500;
     const { user, loading } = useAuthContext();
-    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
     const [alert, setAlert] = useState<string>('');
     const [complete, setComplete] = useState<string>('');
-    const [open, setOpen] = useState(false);
+    const [openPreview, setOpenPreview] = useState<boolean>(false);
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
 
     const [profile, setProfile] = useState<UserBasic>();
     const [clickedImage, setClickedImage] = useState<string>('');
@@ -141,12 +134,11 @@ export default function WritePost() {
             const url = URL.createObjectURL(image);
             setImagePreviewUrl(imagePreviewUrl.concat(url));
         }
-        setMenuAnchor(null);
     };
 
     const handleOpenPreview = (url: string) => {
         setClickedImage(url);
-        setOpen(true);
+        setOpenPreview(true);
     };
 
     const handleSubmit = async () => {
@@ -197,7 +189,7 @@ export default function WritePost() {
         setUploadedImage([]);
         setImagePreviewUrl([]);
         setClickedImage('');
-        setOpen(false);
+        setOpenPreview(false);
     };
 
     return (
@@ -205,8 +197,8 @@ export default function WritePost() {
             {user && (
                 <>
                     <Backdrop
-                        open={open}
-                        onClick={() => setOpen(false)}
+                        open={openPreview}
+                        onClick={() => setOpenPreview(false)}
                         sx={{ zIndex: 9999, mt: '0 !important' }}
                     >
                         <Avatar
@@ -221,7 +213,7 @@ export default function WritePost() {
                     >
                         <Stack
                             direction={{ xs: 'column', sm: 'row' }}
-                            spacing={{ xs: 1, sm: 2 }}
+                            gap={{ xs: 1, sm: 2 }}
                             width={'100%'}
                             p={{ xs: 1, sm: 2 }}
                         >
@@ -323,9 +315,52 @@ export default function WritePost() {
                             </Stack>
                             <Stack
                                 direction={{ xs: 'row', sm: 'column' }}
+                                gap={0.5}
+                                display={openMenu ? 'flex' : 'none'}
+                            >
+                                {toolOptions.map((option) => (
+                                    <Tooltip
+                                        title={option.name}
+                                        placement="top"
+                                        key={option.command}
+                                    >
+                                        <ToggleButton
+                                            value={option.command}
+                                            size="small"
+                                            onClick={option.onclick}
+                                        >
+                                            {option.command !== 'image' ? (
+                                                option.icon
+                                            ) : (
+                                                <Box
+                                                    component={'label'}
+                                                    htmlFor="image"
+                                                    width={24}
+                                                    height={24}
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                    }}
+                                                >
+                                                    {option.icon}
+                                                    <input
+                                                        id="image"
+                                                        name="image"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        hidden
+                                                        onChange={handleImage}
+                                                    />
+                                                </Box>
+                                            )}
+                                        </ToggleButton>
+                                    </Tooltip>
+                                ))}
+                            </Stack>
+                            <Stack
+                                direction={{ xs: 'row', sm: 'column' }}
                                 alignItems={'center'}
                                 justifyContent={'space-between'}
-                                gap={1}
+                                gap={2}
                             >
                                 <Avatar
                                     src={profile?.profileSrc}
@@ -335,98 +370,22 @@ export default function WritePost() {
                                 >
                                     {profile?.username.charAt(0)}
                                 </Avatar>
-                                <Box>
-                                    <Button
-                                        id="editor-button"
-                                        variant="outlined"
-                                        aria-controls={
-                                            Boolean(menuAnchor)
-                                                ? 'editor-menu'
-                                                : undefined
-                                        }
-                                        aria-haspopup="true"
-                                        aria-expanded={
-                                            Boolean(menuAnchor)
-                                                ? 'true'
-                                                : undefined
-                                        }
-                                        onClick={(
-                                            event: React.MouseEvent<HTMLButtonElement>
-                                        ) => setMenuAnchor(event.currentTarget)}
-                                    >
-                                        <AddIcon />
-                                    </Button>
-                                    <Menu
-                                        id="editor-menu"
-                                        anchorEl={menuAnchor}
-                                        open={Boolean(menuAnchor)}
-                                        onClose={() => setMenuAnchor(null)}
-                                        MenuListProps={{
-                                            'aria-labelledby': 'editor-button',
-                                            disablePadding: true,
-                                            sx: {
-                                                display: 'flex',
-                                                p: 0.25,
-                                            },
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        flexGrow: { xs: 0, sm: 1 },
+                                    }}
+                                    onClick={() => setOpenMenu(!openMenu)}
+                                >
+                                    <AddIcon
+                                        sx={{
+                                            transform: openMenu
+                                                ? 'rotate(-45deg)'
+                                                : 'rotate(0)',
+                                            transition: 'all 0.5s',
                                         }}
-                                        anchorOrigin={{
-                                            vertical: 'center',
-                                            horizontal: 'right',
-                                        }}
-                                        transformOrigin={{
-                                            vertical: 'center',
-                                            horizontal: 'left',
-                                        }}
-                                    >
-                                        {toolOptions.map((option) => (
-                                            <Tooltip
-                                                title={option.name}
-                                                placement="top"
-                                                key={option.command}
-                                            >
-                                                <MenuItem
-                                                    value={option.command}
-                                                    aria-label={option.command}
-                                                    disableGutters
-                                                    sx={{ p: 1 }}
-                                                    onClick={() => {
-                                                        if (option.onclick) {
-                                                            option.onclick();
-                                                            setMenuAnchor(null);
-                                                        }
-                                                    }}
-                                                >
-                                                    {option.command !==
-                                                    'image' ? (
-                                                        option.icon
-                                                    ) : (
-                                                        <Box
-                                                            component={'label'}
-                                                            htmlFor="image"
-                                                            width={24}
-                                                            height={24}
-                                                            sx={{
-                                                                cursor: 'pointer',
-                                                            }}
-                                                        >
-                                                            {option.icon}
-                                                            <input
-                                                                id="image"
-                                                                name="image"
-                                                                type="file"
-                                                                accept="image/*"
-                                                                hidden
-                                                                onChange={
-                                                                    handleImage
-                                                                }
-                                                            />
-                                                        </Box>
-                                                    )}
-                                                </MenuItem>
-                                            </Tooltip>
-                                        ))}
-                                    </Menu>
-                                </Box>
+                                    />
+                                </Button>
                                 <Button
                                     variant="contained"
                                     onClick={handleSubmit}
