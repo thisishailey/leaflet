@@ -74,7 +74,6 @@ export default function BottomActionButtons() {
                         horizontal: 'right',
                     }}
                     elevation={5}
-                    slotProps={{ paper: { sx: { borderRadius: 2 } } }}
                     disableScrollLock
                 >
                     <Container sx={{ padding: 2 }}>

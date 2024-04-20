@@ -37,14 +37,10 @@ export default function RootLayout({
                     <body>
                         <RecoilProvider>
                             <AuthContextProvider>
-                                <Header />
-                                <Wrapper>
-                                    <Suspense
-                                        fallback={<Box>{'Loading...'}</Box>}
-                                    >
-                                        {children}
-                                    </Suspense>
-                                </Wrapper>
+                                <Suspense fallback={<Box>{'Loading...'}</Box>}>
+                                    <Header />
+                                    <Wrapper>{children}</Wrapper>
+                                </Suspense>
                                 <Footer />
                             </AuthContextProvider>
                         </RecoilProvider>

@@ -40,7 +40,7 @@ export default function Header() {
 
     const [currentTabGroup, setCurrentTabGroup] = useState<TabGroup>('social');
     const [currentTab, setCurrentTab] = useState<Tab | null>(null);
-    const [currentUser, setCurrentUser] = useState<UserBasic>();
+    const [currentUser, setCurrentUser] = useState<UserBasic | null>(null);
 
     useEffect(() => {
         if (pathname.startsWith('/user')) {
@@ -69,7 +69,7 @@ export default function Header() {
 
     useEffect(() => {
         if (!user) {
-            return;
+            return setCurrentUser(null);
         }
 
         const loadUser = async () => {
@@ -174,6 +174,11 @@ export default function Header() {
                         <Avatar
                             src={currentUser.profileSrc}
                             alt={currentUser.username}
+                            sx={{
+                                border: 1,
+                                bgcolor: 'secondary.main',
+                                borderColor: 'secondary.main',
+                            }}
                         >
                             {currentUser.username.charAt(0)}
                         </Avatar>

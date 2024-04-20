@@ -1,74 +1,76 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getData, getProfileSrc } from '@/firebase/db/getData';
-import { COLLECTION_USER, type UserData } from '@/firebase/db/model';
-import Box from '@mui/material/Box';
+import AuthButtons from '@/firebase/auth/components/authButtons';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Avatar, Button, Stack } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import SettingsIcon from '@mui/icons-material/Settings';
 
-export default function UserProfile({ email }: { email: string }) {
-    const [user, setUser] = useState<UserData>();
-    const [profileSrc, setProfileSrc] = useState<string>();
+interface Props {
+    username: string;
+    profileSrc?: string;
+    followerCount: number;
+    followingCount: number;
+    bio?: string;
+}
 
-    useEffect(() => {
-        const loadUser = async () => {
-            const { result, error } = await getData(COLLECTION_USER, email);
-
-            if (error) {
-                return;
-            }
-
-            const user = result as UserData;
-            setUser(user);
-
-            if (user.profileImg) {
-                const src = await getProfileSrc(user.profileImg);
-                if (src) {
-                    setProfileSrc(src);
-                }
-            }
-        };
-
-        loadUser();
-    }, [email]);
-
+export default function UserProfile(props: Props) {
     return (
-        <>
-            {user && (
+        <Stack
+            direction={'row'}
+            spacing={{ xs: 2, sm: 4, md: 8 }}
+            mt={{ xs: 1, md: 2 }}
+            mb={4}
+            px={{ xs: 0, sm: 2, md: 6, lg: 8 }}
+        >
+            <Stack
+                direction={'column'}
+                alignItems={'center'}
+                spacing={1.5}
+                pt={1}
+            >
+                <Avatar
+                    src={props.profileSrc}
+                    alt={props.username}
+                    sx={{
+                        width: { xs: 54, sm: 72 },
+                        height: { xs: 54, sm: 72 },
+                    }}
+                >
+                    {props.username}
+                </Avatar>
+                <AuthButtons />
+            </Stack>
+            <Stack direction={'column'} spacing={1.5}>
                 <Stack
                     direction={'row'}
+                    alignItems={'center'}
                     justifyContent={'space-between'}
-                    spacing={4}
-                    my={4}
+                    width={220}
                 >
-                    <Stack
-                        direction={'column'}
-                        alignItems={'center'}
-                        spacing={2}
+                    <Typography
+                        component={'h2'}
+                        fontWeight={500}
+                        fontSize={{ xs: 20, sm: 24 }}
                     >
-                        <Avatar src={profileSrc} />
-                        <Stack direction={'row'}>
-                            <Button>{'수정'}</Button>
-                            <Button>{'설정'}</Button>
-                        </Stack>
-                    </Stack>
-                    <Stack direction={'column'} width={'100%'} spacing={2}>
-                        <Typography>{user.username}</Typography>
-                        <Stack direction={'row'} spacing={4}>
-                            <Typography>
-                                {`팔로워 ${user.follower?.length || 0}명`}
-                            </Typography>
-                            <Typography>
-                                {`팔로잉 ${user.following?.length || 0}명`}
-                            </Typography>
-                        </Stack>
-                        <Typography>
-                            {user.bio || '바이오를 작성해 주세요.'}
-                        </Typography>
-                    </Stack>
+                        {props.username}
+                    </Typography>
+                    <IconButton size="small">
+                        <EditIcon />
+                    </IconButton>
                 </Stack>
-            )}
-        </>
+                <ButtonGroup fullWidth sx={{ width: 220 }}>
+                    <Button>{`팔로워 ${props.followerCount}명`}</Button>
+                    <Button>{`팔로잉 ${props.followingCount}명`}</Button>
+                </ButtonGroup>
+                <Typography>
+                    {props.bio || '바이오를 작성해 주세요.'}
+                </Typography>
+            </Stack>
+        </Stack>
     );
 }

@@ -188,10 +188,7 @@ export default function Post({ params }: { params: { postId: string } }) {
         <>
             <style>{`footer {display: none;} #bottom-action-buttons {display: none;}`}</style>
             <CustomAlert alert={alert} setAlert={setAlert} />
-            <Paper
-                variant="outlined"
-                sx={{ minHeight: 200, px: 2, py: 1.5, borderRadius: 4 }}
-            >
+            <Paper variant="outlined" sx={{ minHeight: 200, px: 2, py: 1.5 }}>
                 <Stack
                     direction={'row'}
                     alignItems={'center'}
@@ -274,10 +271,7 @@ export default function Post({ params }: { params: { postId: string } }) {
                     ))}
                 </Grid>
             </Paper>
-            <Paper
-                variant="outlined"
-                sx={{ minHeight: 200, mt: 2, p: 2, borderRadius: 4 }}
-            >
+            <Paper variant="outlined" sx={{ minHeight: 200, mt: 2, p: 2 }}>
                 <Stack
                     direction={'row'}
                     spacing={2}
@@ -363,7 +357,6 @@ export default function Post({ params }: { params: { postId: string } }) {
                     onSubmit={handleSubmit}
                     sx={{
                         p: 2,
-                        borderRadius: 4,
                         borderColor: 'primary.main',
                         display: 'flex',
                         gap: 2,
@@ -383,7 +376,6 @@ export default function Post({ params }: { params: { postId: string } }) {
                                 ? '댓글을 작성해 주세요.'
                                 : '로그인 후 댓글을 작성해 주세요.'
                         }
-                        InputProps={{ sx: { borderRadius: 3 } }}
                     />
                     <Stack
                         direction={'column'}
@@ -405,7 +397,6 @@ export default function Post({ params }: { params: { postId: string } }) {
                                 minWidth: 40,
                                 height: 40,
                                 p: 1,
-                                borderRadius: 3,
                             }}
                         >
                             <SendIcon />

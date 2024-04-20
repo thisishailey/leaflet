@@ -25,7 +25,6 @@ export default function CustomAlert({ alert, setAlert }: Props) {
                     width: '100%',
                     maxWidth: 976,
                     mb: 2,
-                    borderRadius: 2,
                     display: alert ? 'flex' : 'none',
                 }}
             >

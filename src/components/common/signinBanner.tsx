@@ -12,7 +12,6 @@ export default function SignInBanner({ nextAction }: { nextAction: string }) {
                 width: '100%',
                 maxWidth: 976,
                 p: 2,
-                borderRadius: 4,
                 bgcolor: 'primary.light',
             }}
         >
