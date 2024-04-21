@@ -36,7 +36,11 @@ import StarterKit from '@tiptap/starter-kit';
 import CharacterCount from '@tiptap/extension-character-count';
 import { Typography as TiptapTypography } from '@tiptap/extension-typography';
 
-export default function WritePost() {
+interface Props {
+    handleRefresh: () => void;
+}
+
+export default function WritePost({ handleRefresh }: Props) {
     const CHAR_LIMIT = 500;
     const { user, loading } = useAuthContext();
 
@@ -190,6 +194,7 @@ export default function WritePost() {
         setImagePreviewUrl([]);
         setClickedImage('');
         setOpenPreview(false);
+        handleRefresh();
     };
 
     return (
@@ -207,23 +212,25 @@ export default function WritePost() {
                             sx={{ width: { xs: 300, md: 500 }, height: 'auto' }}
                         />
                     </Backdrop>
-                    <Paper
-                        variant="outlined"
-                        sx={{ width: '100%', maxWidth: 976 }}
-                    >
+                    <Paper elevation={2} sx={{ width: '100%', maxWidth: 976 }}>
                         <Stack
                             direction={{ xs: 'column', sm: 'row' }}
                             gap={{ xs: 1, sm: 2 }}
                             width={'100%'}
                             p={{ xs: 1, sm: 2 }}
                         >
-                            <Stack direction={'column'} width={'100%'}>
+                            <Stack
+                                direction={'column'}
+                                width={'100%'}
+                                spacing={0.5}
+                            >
                                 <Box
                                     id={'editor'}
                                     width={'100%'}
                                     minHeight={100}
                                     height={'100%'}
                                     p={1}
+                                    bgcolor={'secondary.main'}
                                     onClick={() => editor.commands.focus()}
                                 >
                                     {editor?.isEmpty && !editor?.isFocused && (

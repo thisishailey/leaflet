@@ -353,10 +353,11 @@ export default function Post({ params }: { params: { postId: string } }) {
             >
                 <Paper
                     component={'form'}
-                    variant="outlined"
+                    elevation={4}
                     onSubmit={handleSubmit}
                     sx={{
                         p: 2,
+                        border: 1,
                         borderColor: 'primary.main',
                         display: 'flex',
                         gap: 2,
@@ -367,7 +368,7 @@ export default function Post({ params }: { params: { postId: string } }) {
                         fullWidth
                         required
                         multiline
-                        rows={4}
+                        rows={3}
                         id="new-comment"
                         name="new-comment"
                         disabled={Boolean(!currentUser)}
@@ -376,6 +377,7 @@ export default function Post({ params }: { params: { postId: string } }) {
                                 ? '댓글을 작성해 주세요.'
                                 : '로그인 후 댓글을 작성해 주세요.'
                         }
+                        inputProps={{ maxLength: 150 }}
                     />
                     <Stack
                         direction={'column'}

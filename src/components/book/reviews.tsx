@@ -28,9 +28,14 @@ interface Props {
 }
 
 export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
+    const REVIEWS_PER_PAGE = 2;
     const { user } = useAuthContext();
 
+    const [refresh, setRefresh] = useState<boolean>(true);
     const [reviews, setReviews] = useState<BookReview[]>([]);
+    const [currentPageReviews, setCurrentPageReviews] = useState<BookReview[]>(
+        []
+    );
     const [currentUser, setCurrentUser] = useState<UserBasic>();
     const [currentUserReview, setCurrentUserReview] =
         useState<BookReview | null>(null);
@@ -75,12 +80,15 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                 .reduce((acc, cur) => acc + cur);
             const ratingAvg = ratingSum / reviews.length;
 
-            setReviews(reviews);
             setReviewRatingAvg(Math.round(ratingAvg * 10) / 10);
+            setReviews(reviews);
+
+            const currentPageReviews = reviews.slice(0, REVIEWS_PER_PAGE);
+            setCurrentPageReviews(currentPageReviews);
         };
 
         loadReviews();
-    }, [bookId]);
+    }, [bookId, refresh]);
 
     useEffect(() => {
         if (!currentUser || reviews.length === 0) {
@@ -109,6 +117,13 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
         value: number
     ) => {
         setReviewPage(value);
+
+        const startIdx = REVIEWS_PER_PAGE * (value - 1);
+        const currentPageReviews = reviews.slice(
+            startIdx,
+            startIdx + REVIEWS_PER_PAGE
+        );
+        setCurrentPageReviews(currentPageReviews);
     };
 
     const handleReviewSubmit = async (
@@ -135,6 +150,7 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
         }
 
         setSnackbar('리뷰가 등록되었습니다.');
+        setRefresh(!refresh);
     };
 
     return (
@@ -182,7 +198,6 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
             )}
             {!currentUserReview && currentUser && (
                 <Paper
-                    variant="outlined"
                     sx={{
                         width: '100%',
                         p: 2,
@@ -211,6 +226,7 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                             multiline
                             rows={3}
                             placeholder={'리뷰를 작성해 주세요.'}
+                            inputProps={{ maxLength: 300 }}
                         />
                     </Box>
                     <Stack
@@ -252,13 +268,19 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                     </Stack>
                 </Paper>
             )}
-            <Stack width={'100%'} direction={'column'} alignItems={'center'}>
+            <Stack
+                width={'100%'}
+                direction={'column'}
+                alignItems={'center'}
+                spacing={1}
+            >
                 {reviews.length === 0 ? (
                     <Typography>{'아직 리뷰가 없습니다.'}</Typography>
                 ) : (
-                    reviews.map((review) => (
+                    currentPageReviews.map((review) => (
                         <Paper
                             key={review.email}
+                            variant="outlined"
                             sx={{
                                 width: '100%',
                                 p: 2,
@@ -317,7 +339,9 @@ export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
                 <Pagination
                     shape="rounded"
                     count={
-                        reviews.length === 0 ? 1 : Math.ceil(reviews.length / 2)
+                        reviews.length === 0
+                            ? 1
+                            : Math.ceil(reviews.length / REVIEWS_PER_PAGE)
                     }
                     page={reviewPage}
                     onChange={handleReviewPageChange}

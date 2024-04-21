@@ -564,7 +564,7 @@ export default function SignUp() {
                                 type="string"
                                 label="바이오"
                                 placeholder="나를 소개해 보세요!"
-                                inputProps={{ maxlength: 200 }}
+                                inputProps={{ maxLength: 200 }}
                             />
                         </>
                     )}

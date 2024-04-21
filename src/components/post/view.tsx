@@ -3,9 +3,15 @@
 import { cache, useEffect, useState } from 'react';
 import { type Post, getPosts } from '@/firebase/db/query';
 import { PostPreview } from './post';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-export default function ViewPost({ search }: { search: string[] }) {
+interface Props {
+    search: string[];
+    refresh: boolean;
+}
+
+export default function ViewPost({ search, refresh }: Props) {
     const [postsAll, setPostsAll] = useState<Post[]>([]);
     const [posts, setPosts] = useState<Post[]>([]);
     const [noPost, setNoPost] = useState(false);
@@ -26,7 +32,7 @@ export default function ViewPost({ search }: { search: string[] }) {
         });
 
         loadPost();
-    }, []);
+    }, [refresh]);
 
     useEffect(() => {
         const handleSearch = () => {
@@ -65,7 +71,7 @@ export default function ViewPost({ search }: { search: string[] }) {
     }, [postsAll, search]);
 
     return (
-        <>
+        <Stack direction={'column'} spacing={1} width={'100%'}>
             {posts &&
                 posts.map((post) => (
                     <PostPreview
@@ -78,6 +84,6 @@ export default function ViewPost({ search }: { search: string[] }) {
                 ))}
             {noPost && <Typography>{noPostText}</Typography>}
             {noSearchResult && <Typography>{noSearchResultText}</Typography>}
-        </>
+        </Stack>
     );
 }

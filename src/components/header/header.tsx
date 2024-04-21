@@ -34,7 +34,7 @@ const userTabs = tabs.slice(3);
 export const HEADER_HEIGHT = '64px';
 
 export default function Header() {
-    const { user } = useAuthContext();
+    const { user, loading } = useAuthContext();
     const { mode } = useColorScheme();
     const pathname = usePathname();
 
@@ -68,6 +68,10 @@ export default function Header() {
     }, [pathname, currentTabGroup, currentTab]);
 
     useEffect(() => {
+        if (loading) {
+            return;
+        }
+
         if (!user) {
             return setCurrentUser(null);
         }
@@ -80,7 +84,7 @@ export default function Header() {
         };
 
         loadUser();
-    }, [user]);
+    }, [user, loading]);
 
     return (
         <AppBar

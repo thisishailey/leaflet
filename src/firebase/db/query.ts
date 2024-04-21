@@ -5,6 +5,7 @@ import {
     query,
     where,
     getDocs,
+    orderBy,
 } from 'firebase/firestore';
 import { firestore } from '../config';
 import {
@@ -41,7 +42,12 @@ export const getPosts = cache(async () => {
     const result: Post[] = [];
     let isEmpty: boolean = false;
 
-    const querySnapshot = await getDocs(col(firestore, COLLECTION_POST));
+    const q = query(
+        col(firestore, COLLECTION_POST),
+        orderBy('timestamp', 'desc')
+    );
+
+    const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
         isEmpty = true;
@@ -79,7 +85,8 @@ export const getReviews = cache(async (isbn: string) => {
 
     const q = query(
         col(firestore, COLLECTION_REVIEW),
-        where('isbn', '==', isbn)
+        where('isbn', '==', isbn),
+        orderBy('timestamp', 'desc')
     );
 
     const querySnapshot = await getDocs(q);

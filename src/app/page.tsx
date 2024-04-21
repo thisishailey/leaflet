@@ -14,6 +14,7 @@ export default function Home() {
     const [search, setSearch] = useState<string[]>([]);
     const [onSearch, setOnSearch] = useState<boolean>(false);
     const [writePost, setWritePost] = useState<boolean>(true);
+    const [refresh, setRefresh] = useState<boolean>(true);
 
     useEffect(() => {
         if (search.length === 0) {
@@ -29,17 +30,21 @@ export default function Home() {
         setSearch(search);
     };
 
+    const handleRefresh = () => {
+        setRefresh(!refresh);
+    };
+
     return (
         <>
             <Stack
                 direction={'column'}
                 alignItems={'center'}
-                spacing={1}
+                spacing={2.5}
                 mb={10}
             >
                 <SearchPost handleSearch={handleSearch} />
-                {writePost && <WritePost />}
-                <ViewPost search={search} />
+                {writePost && <WritePost handleRefresh={handleRefresh} />}
+                <ViewPost search={search} refresh={refresh} />
             </Stack>
             <Fab
                 color="primary"
