@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { firestore } from '../config';
 import { Timestamp, doc, getDoc } from 'firebase/firestore';
 import getFile from '../storage/getFile';
-import { getElapsedTime } from '@/util/datetime';
+import { getElapsedTime, getFormattedDate } from '@/util/datetime';
 import {
     type CommentData,
     type PostData,
@@ -232,6 +232,40 @@ export const getPost = cache(async (postId: string) => {
         elapsedTime,
         images,
         comments,
+    };
+
+    return { data, error };
+});
+
+export interface PostPreview extends PostData {
+    username: string;
+    date: string;
+}
+
+export const getPostPreview = cache(async (postId: string) => {
+    let data: PostPreview | null = null,
+        error: string | null = null;
+
+    const docSnap = await getDoc(doc(firestore, COLLECTION_POST, postId));
+
+    if (!docSnap.exists()) {
+        error = 'requested data does not exist';
+        return { data, error };
+    }
+
+    const postData = docSnap.data() as PostData;
+
+    const user = await getUserProfile(postData.email);
+
+    const timestamp = postData.timestamp as Timestamp;
+    const date = getFormattedDate(timestamp.toDate());
+
+    data = {
+        email: user.data?.email || '',
+        username: user.data?.username || '',
+        content: postData.content,
+        likes: postData.likes || 0,
+        date,
     };
 
     return { data, error };

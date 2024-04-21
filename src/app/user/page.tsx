@@ -88,7 +88,13 @@ export default function Profile() {
                             handleOpenFollowing,
                         }}
                     />
-                    <UserTabs />
+                    <UserTabs
+                        userData={{
+                            email: userData.email,
+                            like: userData.like,
+                            bookmark: userData.bookmark,
+                        }}
+                    />
                     <EditProfile
                         open={openEdit}
                         handleClose={handleCloseEdit}

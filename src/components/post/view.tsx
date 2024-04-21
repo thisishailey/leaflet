@@ -1,6 +1,6 @@
 'use client';
 
-import { cache, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type Post, getPosts } from '@/firebase/db/query';
 import { PostPreview } from './post';
 import Skeleton from '@mui/material/Skeleton';
@@ -23,7 +23,7 @@ export default function ViewPost({ search, refresh }: Props) {
     const noSearchResultText = '검색 결과가 없습니다.';
 
     useEffect(() => {
-        const loadPost = cache(async () => {
+        const loadPost = async () => {
             setLoading(true);
 
             const posts = await getPosts();
@@ -34,19 +34,19 @@ export default function ViewPost({ search, refresh }: Props) {
             }
 
             setPostsAll(posts.result);
+            setPosts(posts.result);
             setLoading(false);
-        });
+        };
 
         loadPost();
     }, [refresh]);
 
     useEffect(() => {
-        const handleSearch = () => {
-            if (search.length === 0) {
-                setLoading(false);
-                return setPosts(postsAll);
-            }
+        if (search.length === 0) {
+            return setPosts(postsAll);
+        }
 
+        const handleSearch = () => {
             setLoading(true);
 
             const filteredPosts: Post[] = [];
@@ -84,16 +84,15 @@ export default function ViewPost({ search, refresh }: Props) {
     return (
         <Stack direction={'column'} spacing={1} width={'100%'}>
             {loading && <SkeletonPostPreviews />}
-            {posts &&
-                posts.map((post) => (
-                    <PostPreview
-                        key={post.id}
-                        id={post.id}
-                        username={post.writer.username}
-                        profileSrc={post.writer.profileSrc}
-                        content={post.data.content}
-                    />
-                ))}
+            {posts.map((post) => (
+                <PostPreview
+                    key={post.id}
+                    id={post.id}
+                    username={post.writer.username}
+                    profileSrc={post.writer.profileSrc}
+                    content={post.data.content}
+                />
+            ))}
             {noPost && <Typography>{noPostText}</Typography>}
             {noSearchResult && <Typography>{noSearchResultText}</Typography>}
         </Stack>

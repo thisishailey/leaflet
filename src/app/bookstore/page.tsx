@@ -25,19 +25,34 @@ const places: BookPlaceTypes[] = ['도서관', '서점', '북카페'];
 
 export default function Bookstore() {
     const [alert, setAlert] = useState<string>('');
-    const [openModal, setOpenModal] = useState<boolean>(false);
     const [place, setPlace] = useState<BookPlaceTypes>('도서관');
-    const [bookPlaces, setBookPlaces] = useState<RegionSearchItem[]>();
+    const [bookPlaces, setBookPlaces] = useState<RegionSearchItem[]>([]);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const [marker, setMarker] = useState<string>('');
 
-    useEffect(() => scrollToTop(), []);
+    useEffect(() => {
+        scrollToTop();
 
-    const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+        const loadSearchResult = async () => {
+            const query = encodeURI('강남 도서관');
+
+            const headers = new Headers({ query });
+            const res = await fetch('/api/bookstore', { headers });
+            const data: RegionSearchResult = await res.json();
+
+            setBookPlaces(data.items);
+        };
+
+        loadSearchResult();
+    }, []);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const region = formData.get('region') as string;
 
         const query = encodeURI(`${region} ${place}`);
+
         const headers = new Headers({ query });
         const res = await fetch('/api/bookstore', { headers });
         const data: RegionSearchResult = await res.json();
@@ -47,7 +62,6 @@ export default function Bookstore() {
         }
 
         setBookPlaces(data.items);
-        console.log(data.items);
     };
 
     return (
@@ -89,7 +103,7 @@ export default function Bookstore() {
                     direction={'row'}
                     spacing={2}
                     component={'form'}
-                    onSubmit={handleSearch}
+                    onSubmit={handleSubmit}
                 >
                     <TextField
                         required
@@ -106,7 +120,7 @@ export default function Bookstore() {
                     {bookPlaces &&
                         bookPlaces.map((place) => (
                             <Paper
-                                key={place.address}
+                                key={place.title}
                                 elevation={4}
                                 sx={{
                                     display: 'flex',

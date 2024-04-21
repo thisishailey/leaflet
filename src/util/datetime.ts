@@ -22,3 +22,11 @@ export const getElapsedTime = (prev: Date) => {
 
     return `${prev.getMonth()}/${prev.getDate()}/${prev.getFullYear()}`;
 };
+
+export const getFormattedDate = (date: Date) => {
+    const formattedDate = `${date.getFullYear()}/${
+        date.getMonth() + 1
+    }/${date.getDate()}`;
+
+    return formattedDate;
+};

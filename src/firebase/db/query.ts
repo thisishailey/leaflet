@@ -16,6 +16,7 @@ import {
     COLLECTION_POST,
 } from './model';
 import { type UserBasic, getUserProfile } from './getData';
+import { getFormattedDate } from '@/util/datetime';
 
 export const checkUsernameAvailability = cache(async (username: string) => {
     const q = query(
@@ -99,10 +100,8 @@ export const getReviews = cache(async (isbn: string) => {
         const reviewData = doc.data() as ReviewData;
         const user = await getUserProfile(reviewData.email);
 
-        const timestamp = (reviewData.timestamp as Timestamp).toDate();
-        const date = `${timestamp.getFullYear()}/${
-            timestamp.getMonth() + 1
-        }/${timestamp.getDate()}`;
+        const timestamp = reviewData.timestamp as Timestamp;
+        const date = getFormattedDate(timestamp.toDate());
 
         const review: BookReview = {
             ...reviewData,
