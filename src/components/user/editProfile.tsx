@@ -7,6 +7,8 @@ import uploadFile from '@/firebase/storage/uploadFile';
 import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { checkUsernameAvailability } from '@/firebase/db/query';
 import { type UsernameState, usernamePattern } from '@/app/auth/signup/page';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState } from '@/state/snackbarState';
 
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -35,6 +37,7 @@ export default function EditProfile({
     handleClose,
     userData,
 }: EditProfileProps) {
+    const setSnackbar = useSetRecoilState(snackbarState);
     const [profilePreview, setProfilePreview] = useState<string>();
     const [username, setUsername] = useState<UsernameState>({
         helper: '',
@@ -85,6 +88,7 @@ export default function EditProfile({
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const newData: UserDataUpdate = {};
+        let needUpdate = false;
 
         const username = data.get('username');
         const firstname = data.get('firstname');
@@ -108,6 +112,7 @@ export default function EditProfile({
                 input.value
             ) {
                 newData[input.name] = input.value;
+                needUpdate = true;
             }
         });
 
@@ -118,16 +123,30 @@ export default function EditProfile({
                 image as File
             );
 
-            if (imageUrl) {
+            if (error) {
+                setSnackbar('프로필 사진을 업로드하지 못했습니다.');
+            } else {
                 newData.profileImg = imageUrl;
+                needUpdate = true;
             }
         }
 
-        const result = await updateData(
-            COLLECTION_USER,
-            userData.email,
-            newData
-        );
+        if (needUpdate) {
+            const result = await updateData(
+                COLLECTION_USER,
+                userData.email,
+                newData
+            );
+
+            if (result.error) {
+                setSnackbar(
+                    '프로필을 업데이트하지 못했습니다. 다시 시도해 주세요.'
+                );
+            } else {
+                setSnackbar('프로필이 성공적으로 업데이트 되었습니다.');
+            }
+        }
+
         handleClose();
     };
 
@@ -156,7 +175,7 @@ export default function EditProfile({
                         textAlign={'center'}
                         pb={1}
                     >
-                        {'프로필 편집'}
+                        {'프로필 수정'}
                     </Typography>
                     <Typography fontWeight={500} fontSize={16}>
                         {'프로필 사진'}

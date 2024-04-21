@@ -133,6 +133,7 @@ export default function Post({ params }: { params: { postId: string } }) {
         } else {
             setLikesCount((likes) => likes + 1);
         }
+		
         setIsLiked(!isLiked);
     };
 

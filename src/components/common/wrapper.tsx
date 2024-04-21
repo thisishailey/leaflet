@@ -2,6 +2,7 @@ import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
 import { HEADER_HEIGHT } from '../header/header';
 import BottomActionButtons from './fab';
+import CustomSnackbar from './snackbar';
 
 export default function Wrapper({ children }: { children: React.ReactNode }) {
     return (
@@ -23,6 +24,7 @@ export default function Wrapper({ children }: { children: React.ReactNode }) {
             >
                 {children}
                 <BottomActionButtons />
+                <CustomSnackbar />
             </Container>
         </>
     );

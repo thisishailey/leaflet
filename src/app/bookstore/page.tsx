@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { RegionSearchItem, RegionSearchResult } from '../api/bookstore/type';
+import { scrollToTop } from '@/util/common';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CustomAlert from '@/components/common/alert';
@@ -28,6 +29,8 @@ export default function Bookstore() {
     const [place, setPlace] = useState<BookPlaceTypes>('도서관');
     const [bookPlaces, setBookPlaces] = useState<RegionSearchItem[]>();
     const [marker, setMarker] = useState<string>('');
+
+    useEffect(() => scrollToTop(), []);
 
     const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

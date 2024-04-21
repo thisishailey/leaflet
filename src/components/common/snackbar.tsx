@@ -1,15 +1,15 @@
-import type { Dispatch, SetStateAction } from 'react';
+'use client';
+
+import { useRecoilState } from 'recoil';
+import { snackbarState } from '@/state/snackbarState';
 import Snackbar from '@mui/material/Snackbar';
 
-interface Props {
-    snackbar: string;
-    setSnackbar: Dispatch<SetStateAction<string>>;
-}
+export default function CustomSnackbar() {
+    const [snackbar, setSnackbar] = useRecoilState(snackbarState);
 
-export default function CustomSnackbar({ snackbar, setSnackbar }: Props) {
     return (
         <Snackbar
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             autoHideDuration={4000}
             open={snackbar !== ''}
             onClose={() => setSnackbar('')}

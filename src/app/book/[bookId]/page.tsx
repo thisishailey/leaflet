@@ -10,7 +10,6 @@ import BookReviews from '@/components/book/reviews';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import CustomAlert from '@/components/common/alert';
-import CustomSnackbar from '@/components/common/snackbar';
 import Divider from '@mui/material/Divider';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
@@ -21,7 +20,6 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 export default function BookDetail({ params }: { params: { bookId: string } }) {
     const { push } = useRouter();
     const [alert, setAlert] = useState<string>('');
-    const [snackbar, setSnackbar] = useState<string>('');
     const [book, setBook] = useState<BookItem>();
 
     useEffect(() => scrollToTop(), []);
@@ -45,7 +43,6 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
     return (
         <>
             <CustomAlert alert={alert} setAlert={setAlert} />
-            <CustomSnackbar snackbar={snackbar} setSnackbar={setSnackbar} />
             {book && (
                 <Box width={'100%'} maxWidth={976} height={'100%'} p={2}>
                     <Breadcrumbs
@@ -167,7 +164,6 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
                         <Divider orientation="horizontal" flexItem />
                         <BookReviews
                             setAlert={setAlert}
-                            setSnackbar={setSnackbar}
                             bookId={params.bookId}
                         />
                     </Stack>

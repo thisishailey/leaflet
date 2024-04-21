@@ -6,6 +6,8 @@ import addData from '@/firebase/db/addData';
 import { type UserBasic, getUserProfile } from '@/firebase/db/getData';
 import { type BookReview, getReviews } from '@/firebase/db/query';
 import { type ReviewData, COLLECTION_REVIEW } from '@/firebase/db/model';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState } from '@/state/snackbarState';
 
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -23,13 +25,13 @@ import Typography from '@mui/material/Typography';
 
 interface Props {
     setAlert: Dispatch<SetStateAction<string>>;
-    setSnackbar: Dispatch<SetStateAction<string>>;
     bookId: string;
 }
 
-export default function BookReviews({ setAlert, setSnackbar, bookId }: Props) {
+export default function BookReviews({ setAlert, bookId }: Props) {
     const REVIEWS_PER_PAGE = 2;
     const { user } = useAuthContext();
+    const setSnackbar = useSetRecoilState(snackbarState);
 
     const [refresh, setRefresh] = useState<boolean>(true);
     const [reviews, setReviews] = useState<BookReview[]>([]);

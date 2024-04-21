@@ -106,34 +106,3 @@ export default function Profile() {
         </>
     );
 }
-
-// function SkeletonProfile() {
-//     return (
-//         <Stack
-//             direction={'row'}
-//             spacing={{ xs: 2, sm: 4, md: 8 }}
-//             width={'100%'}
-//             mt={{ xs: 2, md: 4 }}
-//             mb={4}
-//             px={{ xs: 0, sm: 2, md: 6, lg: 8 }}
-//         >
-//             <Stack direction={'column'} alignItems={'center'} spacing={1.5}>
-//                 <Skeleton
-//                     variant="circular"
-//                     width={72}
-//                     height={72}
-//                     sx={{ minWidth: 72 }}
-//                 />
-//                 <Skeleton variant="rectangular" width={64} height={28} />
-//             </Stack>
-//             <Stack direction={'column'} spacing={1.5} width={'100%'}>
-//                 <Skeleton variant="rectangular" width={220} height={36} />
-//                 <Stack direction={'row'} gap={1}>
-//                     <Skeleton variant="rectangular" width={106} height={36} />
-//                     <Skeleton variant="rectangular" width={106} height={36} />
-//                 </Stack>
-//                 <Skeleton variant="rectangular" width={'100%'} height={50} />
-//             </Stack>
-//         </Stack>
-//     );
-// }
