@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Fade from '@mui/material/Fade';
 import Paper from '@mui/material/Paper';
+import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import SignInBanner from '../common/signinBanner';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -199,6 +200,12 @@ export default function WritePost({ handleRefresh }: Props) {
 
     return (
         <>
+            {loading && (
+                <Skeleton variant="rectangular" width={'100%'} height={176} />
+            )}
+            {!loading && !user && (
+                <SignInBanner nextAction={'하고 리프를 작성해 보세요!'} />
+            )}
             {user && (
                 <>
                     <Backdrop
@@ -424,9 +431,6 @@ export default function WritePost({ handleRefresh }: Props) {
                         </Alert>
                     </Fade>
                 </>
-            )}
-            {!loading && !user && (
-                <SignInBanner nextAction={'하고 리프를 작성해 보세요!'} />
             )}
         </>
     );
