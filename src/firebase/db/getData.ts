@@ -261,6 +261,7 @@ export const getPostPreview = cache(async (postId: string) => {
     const date = getFormattedDate(timestamp.toDate());
 
     data = {
+        _id: postId,
         email: user.data?.email || '',
         username: user.data?.username || '',
         content: postData.content,

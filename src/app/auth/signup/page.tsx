@@ -59,7 +59,7 @@ interface UserDataState {
 
 const steps: string[] = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
 const passwordPattern: string = '(?=.*[0-9])(?=.*[a-z]).{8,}';
-export const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
+const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
 
 export default function SignUp() {
     const { replace } = useRouter();

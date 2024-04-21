@@ -6,7 +6,7 @@ import { type UserDataUpdate, COLLECTION_USER } from '@/firebase/db/model';
 import uploadFile from '@/firebase/storage/uploadFile';
 import { PROFILE_IMAGE } from '@/firebase/storage/directory';
 import { checkUsernameAvailability } from '@/firebase/db/query';
-import { type UsernameState, usernamePattern } from '@/app/auth/signup/page';
+import { type UsernameState } from '@/app/auth/signup/page';
 import { useSetRecoilState } from 'recoil';
 import { snackbarState } from '@/state/snackbarState';
 
@@ -53,6 +53,7 @@ export default function EditProfile({
         }
     };
 
+    const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
     const handleCheckUsername = async (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
