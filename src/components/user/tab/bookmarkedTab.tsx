@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { type PostPreview, getPostPreview } from '@/firebase/db/getData';
-import { updateLike } from '@/firebase/db/updateData';
+import { updateBookmark } from '@/firebase/db/updateData';
 import { useSetRecoilState } from 'recoil';
 import { snackbarState } from '@/state/snackbarState';
 
@@ -16,25 +16,25 @@ import CloseIcon from '@mui/icons-material/Close';
 
 interface Props {
     email: string;
-    likedPosts: string[];
+    bookmarkedPosts: string[];
 }
 
-export default function LikedPosts({ email, likedPosts }: Props) {
+export default function BookmarkedPosts({ email, bookmarkedPosts }: Props) {
     const setSnackbar = useSetRecoilState(snackbarState);
     const [posts, setPosts] = useState<PostPreview[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (likedPosts.length === 0) {
+        if (bookmarkedPosts.length === 0) {
             return;
         }
 
-        const loadLikedPosts = async () => {
+        const loadBookmarkedPosts = async () => {
             setLoading(true);
             const posts: PostPreview[] = [];
 
-            for (let i = 0; i < likedPosts.length; i++) {
-                const result = await getPostPreview(likedPosts[i]);
+            for (let i = 0; i < bookmarkedPosts.length; i++) {
+                const result = await getPostPreview(bookmarkedPosts[i]);
 
                 if (result.data) {
                     posts.push(result.data);
@@ -45,16 +45,16 @@ export default function LikedPosts({ email, likedPosts }: Props) {
             setLoading(false);
         };
 
-        loadLikedPosts();
-    }, [likedPosts]);
+        loadBookmarkedPosts();
+    }, [bookmarkedPosts]);
 
     const handleRemove = async (postId: string) => {
-        const result = await updateLike(email, postId, true);
+        const result = await updateBookmark(email, postId, true);
 
         if (result.error) {
             setSnackbar('오류가 발생했습니다. 다시 시도해 주세요.');
         } else {
-            setSnackbar('좋아요가 취소되었습니다.');
+            setSnackbar('북마크가 취소되었습니다.');
         }
 
         setPosts((prev) => prev.filter((post) => post._id !== postId));

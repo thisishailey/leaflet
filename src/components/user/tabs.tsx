@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
+import BookmarkedPosts from './tab/bookmarkedTab';
 import Box from '@mui/material/Box';
 import LikedPosts from './tab/likedTab';
 import Tab from '@mui/material/Tab';
@@ -77,6 +78,7 @@ export default function UserTabs({ userData }: Props) {
                         />
                     </TabList>
                 </Box>
+
                 <TabPanel value="1">{'내 리프'}</TabPanel>
                 <TabPanel value="2">{'내 리뷰'}</TabPanel>
                 <TabPanel value="3">
@@ -86,12 +88,23 @@ export default function UserTabs({ userData }: Props) {
                             likedPosts={userData.like}
                         />
                     ) : (
-                        <Typography>
+                        <Typography textAlign={'center'}>
                             {'아직 좋아요를 누른 리프가 없습니다.'}
                         </Typography>
                     )}
                 </TabPanel>
-                <TabPanel value="4">{'내가 저장한 리프'}</TabPanel>
+                <TabPanel value="4">
+                    {userData.bookmark ? (
+                        <BookmarkedPosts
+                            email={userData.email}
+                            bookmarkedPosts={userData.bookmark}
+                        />
+                    ) : (
+                        <Typography textAlign={'center'}>
+                            {'아직 북마크 한 리프가 없습니다.'}
+                        </Typography>
+                    )}
+                </TabPanel>
             </TabContext>
         </Box>
     );

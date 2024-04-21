@@ -1,9 +1,9 @@
-import Typography from '@mui/material/Typography';
+import ToBeUpdated from '@/components/common/tbu';
 
 export default function Following() {
     return (
         <>
-            <Typography>{'팔로우 중인 계정이 없습니다.'}</Typography>
+            <ToBeUpdated />
         </>
     );
 }

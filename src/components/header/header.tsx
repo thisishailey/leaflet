@@ -165,15 +165,7 @@ export default function Header() {
                             );
                         })}
                 </Stack>
-                <Link
-                    href={
-                        user === null
-                            ? '/auth/signin'
-                            : currentTabGroup === 'social'
-                            ? '/user/following'
-                            : '/user'
-                    }
-                >
+                <Link href={user === null ? '/auth/signin' : '/user'}>
                     {currentUser ? (
                         <Avatar
                             src={currentUser.profileSrc}
