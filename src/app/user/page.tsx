@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '@/firebase/auth/state';
 import { getData, getProfileSrc } from '@/firebase/db/getData';
-import { COLLECTION_USER, type UserData } from '@/firebase/db/model';
+import { type UserData, COLLECTION_USER } from '@/firebase/db/model';
 
-import AuthButtons from '@/firebase/auth/components/authButtons';
+import CircularProgress from '@mui/material/CircularProgress';
 import CustomAlert from '@/components/common/alert';
+import Stack from '@mui/material/Stack';
 import UserProfile from '@/components/user/profile';
 import UserTabs from '@/components/user/tabs';
+import EditProfile from '@/components/user/editProfile';
 
 export default function Profile() {
     const { user, loading } = useAuthContext();
@@ -17,6 +19,10 @@ export default function Profile() {
     const [userData, setUserData] = useState<
         (UserData & { profileSrc?: string }) | null
     >(null);
+
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openFollower, setOpenFollower] = useState(false);
+    const [openFollowing, setOpenFollowing] = useState(false);
 
     useEffect(() => {
         if (loading) {
@@ -52,9 +58,22 @@ export default function Profile() {
         loadUser();
     }, [user, loading]);
 
+    const handleOpenEdit = () => setOpenEdit(true);
+    const handleOpenFollower = () => setOpenFollower(true);
+    const handleOpenFollowing = () => setOpenFollowing(true);
+
+    const handleCloseEdit = () => setOpenEdit(false);
+    const handleCloseFollower = () => setOpenFollower(false);
+    const handleCloseFollowing = () => setOpenFollowing(false);
+
     return (
         <>
             <CustomAlert alert={alert} setAlert={setAlert} />
+            {loading && (
+                <Stack alignItems={'center'} mt={20}>
+                    <CircularProgress />
+                </Stack>
+            )}
             {userData && (
                 <>
                     <UserProfile
@@ -63,11 +82,58 @@ export default function Profile() {
                         followerCount={userData.follower?.length || 0}
                         followingCount={userData.following?.length || 0}
                         bio={userData.bio}
+                        handlers={{
+                            handleOpenEdit,
+                            handleOpenFollower,
+                            handleOpenFollowing,
+                        }}
                     />
                     <UserTabs />
+                    <EditProfile
+                        open={openEdit}
+                        handleClose={handleCloseEdit}
+                        userData={{
+                            email: userData.email,
+                            username: userData.username,
+                            firstname: userData.firstname,
+                            lastname: userData.lastname,
+                            profileSrc: userData.profileSrc,
+                            bio: userData.bio,
+                        }}
+                    />
                 </>
             )}
-            {!loading && !userData && <AuthButtons />}
         </>
     );
 }
+
+// function SkeletonProfile() {
+//     return (
+//         <Stack
+//             direction={'row'}
+//             spacing={{ xs: 2, sm: 4, md: 8 }}
+//             width={'100%'}
+//             mt={{ xs: 2, md: 4 }}
+//             mb={4}
+//             px={{ xs: 0, sm: 2, md: 6, lg: 8 }}
+//         >
+//             <Stack direction={'column'} alignItems={'center'} spacing={1.5}>
+//                 <Skeleton
+//                     variant="circular"
+//                     width={72}
+//                     height={72}
+//                     sx={{ minWidth: 72 }}
+//                 />
+//                 <Skeleton variant="rectangular" width={64} height={28} />
+//             </Stack>
+//             <Stack direction={'column'} spacing={1.5} width={'100%'}>
+//                 <Skeleton variant="rectangular" width={220} height={36} />
+//                 <Stack direction={'row'} gap={1}>
+//                     <Skeleton variant="rectangular" width={106} height={36} />
+//                     <Skeleton variant="rectangular" width={106} height={36} />
+//                 </Stack>
+//                 <Skeleton variant="rectangular" width={'100%'} height={50} />
+//             </Stack>
+//         </Stack>
+//     );
+// }

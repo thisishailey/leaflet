@@ -8,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
 
 interface Props {
     username: string;
@@ -16,6 +15,11 @@ interface Props {
     followerCount: number;
     followingCount: number;
     bio?: string;
+    handlers: {
+        handleOpenEdit: () => void;
+        handleOpenFollower: () => void;
+        handleOpenFollowing: () => void;
+    };
 }
 
 export default function UserProfile(props: Props) {
@@ -59,13 +63,20 @@ export default function UserProfile(props: Props) {
                     >
                         {props.username}
                     </Typography>
-                    <IconButton size="small">
+                    <IconButton
+                        size="small"
+                        onClick={props.handlers.handleOpenEdit}
+                    >
                         <EditIcon />
                     </IconButton>
                 </Stack>
                 <ButtonGroup fullWidth sx={{ width: 220 }}>
-                    <Button>{`팔로워 ${props.followerCount}명`}</Button>
-                    <Button>{`팔로잉 ${props.followingCount}명`}</Button>
+                    <Button
+                        onClick={props.handlers.handleOpenFollower}
+                    >{`팔로워 ${props.followerCount}명`}</Button>
+                    <Button
+                        onClick={props.handlers.handleOpenFollowing}
+                    >{`팔로잉 ${props.followingCount}명`}</Button>
                 </ButtonGroup>
                 <Typography>
                     {props.bio || '바이오를 작성해 주세요.'}

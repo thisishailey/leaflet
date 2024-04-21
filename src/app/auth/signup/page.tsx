@@ -45,7 +45,7 @@ interface RePasswordState {
     error: boolean;
 }
 
-interface UsernameState {
+export interface UsernameState {
     helper: string;
     error: boolean;
 }
@@ -59,7 +59,7 @@ interface UserDataState {
 
 const steps: string[] = ['계정 만들기', '이름 입력하기', '프로필 꾸미기'];
 const passwordPattern: string = '(?=.*[0-9])(?=.*[a-z]).{8,}';
-const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
+export const usernamePattern: string = '^[a-zA-Z0-9_]{4,16}$';
 
 export default function SignUp() {
     const { replace } = useRouter();
@@ -303,6 +303,7 @@ export default function SignUp() {
 
         let newData: UserDataUpdate = {},
             needUpdate: boolean = false;
+			
         if (image) {
             const { error, imageUrl } = await uploadFile(
                 PROFILE_IMAGE,
@@ -312,12 +313,12 @@ export default function SignUp() {
             if (error) {
                 setAlert('프로필 사진을 업로드하지 못했습니다.');
             } else {
-                newData = { profileImg: imageUrl };
+                newData.profileImg = imageUrl;
                 needUpdate = true;
             }
         }
         if (bio) {
-            newData = { ...newData, bio: bio as string };
+            newData.bio = bio as string;
             needUpdate = true;
         }
 
