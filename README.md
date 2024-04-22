@@ -2,7 +2,7 @@
 
 ## Overview
 
-A social media platform for book-lovers.
+A social media platform for book-lovers!
 
 > 🌐 [Website](https://leaflet-readership.vercel.app/) \
 > 📑 [Notion](https://www.notion.so/hailey-page/Project-Leaflet-0226331222634270955d9e59b94f8ca9)
@@ -16,10 +16,11 @@ A social media platform for book-lovers.
     -   TypeScript
     -   Next.js
 -   State Management
+    -   Recoil
     -   Context API
 -   API
-    -   알라딘 API
-    -   네이버 API
+    -   Aladin API (books)
+    -   Naver API (places, map, geocode)
 -   Backend & DB
     -   Firebase Authentication
     -   Firebase Cloud Firestore
@@ -33,8 +34,8 @@ A social media platform for book-lovers.
     -   Notion
 -   Other
     -   VS Code
-    -   Tiptap
-    -   uuid
+    -   Tiptap (WYSIWYG editor)
+    -   uuid (UUID generator)
 
 ## Features
 
@@ -44,30 +45,35 @@ A social media platform for book-lovers.
 -   Enable dark mode (light, system, dark)
 -   Customize Material UI
 -   Sticky header(nav bar) & footer
--   Scroll-to-top FAB button
+-   ... and more!
 
 ### Back-End
 
--   Authentication (email & password sign up, sign in, & sign out)
+-   Authentication (sign up, sign in, & sign out with email & password or with your Google account)
 -   Database (store, get, & update user data, posts, post comments, & book reviews)
 -   Storage (store & access image files)
 
 ### Posts
 
--   Search posts by keyword
--   Make posts (if signed in)
+-   Search posts by keywords
 -   View posts
--   Comment, like, & bookmark on posts (if signed in)
+-   Make posts (if signed in)
+-   Comment, like, & bookmark posts (if signed in)
 
 ### Books
 
--   View bestsellers & new arrivals on Aladin (Aladin API)
+-   View bestsellers & new arrivals (Aladin API)
 -   Search books (Aladin API)
--   View book details
 -   Review & rate books (if signed in)
 
 ### Bookstore
 
 -   Search bookstores (Naver Region Search API)
--   View bookstores from search result (name, address, homepage link, etc.)
--   Check bookstore's location on the map (Naver Maps API)
+-   Display bookstore's location on the map (Naver Maps API)
+
+### User
+
+-   View my profile
+-   Edit my profile
+-   View my posts & my reviews
+-   View & remove posts I liked or bookmarked
