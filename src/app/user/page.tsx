@@ -91,6 +91,7 @@ export default function Profile() {
                     <UserTabs
                         userData={{
                             email: userData.email,
+							username: userData.username,
                             like: userData.like,
                             bookmark: userData.bookmark,
                         }}

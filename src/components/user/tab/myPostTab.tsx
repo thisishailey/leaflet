@@ -2,67 +2,56 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { type PostPreview, getPostPreview } from '@/firebase/db/getData';
-import { updateLike } from '@/firebase/db/updateData';
+import { getPostsByUserId } from '@/firebase/db/query';
+import type { PostData } from '@/firebase/db/model';
 import { useSetRecoilState } from 'recoil';
 import { snackbarState } from '@/state/snackbarState';
+import { getFormattedDate } from '@/util/datetime';
 
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import SkeletonPreviews from './skeleton';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 interface Props {
     email: string;
-    likedPosts: string[];
+    username: string;
 }
 
-export default function LikedPosts({ email, likedPosts }: Props) {
+export default function MyPosts({ email, username }: Props) {
     const setSnackbar = useSetRecoilState(snackbarState);
-    const [posts, setPosts] = useState<PostPreview[]>([]);
+    const [posts, setPosts] = useState<PostData[]>([]);
+    const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (likedPosts.length === 0) {
-            return;
-        }
-
-        const loadLikedPosts = async () => {
+        const loadMyPosts = async () => {
             setLoading(true);
-            const posts: PostPreview[] = [];
 
-            for (let i = 0; i < likedPosts.length; i++) {
-                const result = await getPostPreview(likedPosts[i]);
+            const { result, isEmpty } = await getPostsByUserId(email);
 
-                if (result.data) {
-                    posts.push(result.data);
-                }
+            if (isEmpty) {
+                setIsEmpty(true);
+                return setLoading(false);
             }
 
-            setPosts(posts);
+            setPosts(result);
             setLoading(false);
         };
 
-        loadLikedPosts();
-    }, [likedPosts]);
-
-    const handleRemove = async (postId: string) => {
-        const result = await updateLike(email, postId, true);
-
-        if (result.error) {
-            setSnackbar('오류가 발생했습니다. 다시 시도해 주세요.');
-        } else {
-            setSnackbar('좋아요가 취소되었습니다.');
-        }
-
-        setPosts((prev) => prev.filter((post) => post._id !== postId));
-    };
+        loadMyPosts();
+    }, [email]);
 
     return (
         <Stack direction={'column'} spacing={2}>
             {loading && <SkeletonPreviews />}
+            {isEmpty && (
+                <Typography textAlign={'center'}>
+                    {'아직 작성한 리프가 없습니다.'}
+                </Typography>
+            )}
             {posts.map((post) => (
                 <Paper key={post._id}>
                     <Stack direction={'column'} spacing={1} p={2} pt={1}>
@@ -72,10 +61,10 @@ export default function LikedPosts({ email, likedPosts }: Props) {
                             justifyContent={'space-between'}
                         >
                             <Typography fontWeight={500} fontSize={18}>
-                                {post.username}
+                                {username}
                             </Typography>
-                            <IconButton onClick={() => handleRemove(post._id!)}>
-                                <CloseIcon />
+                            <IconButton>
+                                <MoreVertIcon />
                             </IconButton>
                         </Stack>
                         <Link href={`/post/${post._id}`}>
@@ -84,20 +73,29 @@ export default function LikedPosts({ email, likedPosts }: Props) {
                                     __html: post.content,
                                 }}
                             ></div>
+                        </Link>
+                        <Stack
+                            direction={'row'}
+                            justifyContent={'space-between'}
+                            pt={1}
+                        >
                             <Stack
                                 direction={'row'}
                                 justifyContent={'space-between'}
-                                mt={2}
+                                spacing={2}
                             >
                                 <Typography
                                     fontSize={14}
                                     color={'primary'}
-                                >{`좋아요 ${post.likes}개`}</Typography>
+                                >{`좋아요 ${post.likes || 0}개`}</Typography>
                                 <Typography fontSize={14} color={'primary'}>
-                                    {post.date}
+                                    {`댓글 ${post.comments?.length || 0}개`}
                                 </Typography>
                             </Stack>
-                        </Link>
+                            <Typography fontSize={14} color={'primary'}>
+                                {getFormattedDate(post.timestamp!.toDate())}
+                            </Typography>
+                        </Stack>
                     </Stack>
                 </Paper>
             ))}

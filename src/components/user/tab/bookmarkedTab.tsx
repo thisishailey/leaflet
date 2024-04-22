@@ -87,7 +87,7 @@ export default function BookmarkedPosts({ email, bookmarkedPosts }: Props) {
                             <Stack
                                 direction={'row'}
                                 justifyContent={'space-between'}
-                                pt={1}
+                                mt={2}
                             >
                                 <Typography
                                     fontSize={14}

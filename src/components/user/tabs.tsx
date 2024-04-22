@@ -7,6 +7,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import BookmarkedPosts from './tab/bookmarkedTab';
 import Box from '@mui/material/Box';
 import LikedPosts from './tab/likedTab';
+import MyPosts from './tab/myPostTab';
+import MyReviews from './tab/myReviewTab';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -18,6 +20,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 interface Props {
     userData: {
         email: string;
+        username: string;
         like: string[] | undefined;
         bookmark: string[] | undefined;
     };
@@ -79,8 +82,17 @@ export default function UserTabs({ userData }: Props) {
                     </TabList>
                 </Box>
 
-                <TabPanel value="1">{'내 리프'}</TabPanel>
-                <TabPanel value="2">{'내 리뷰'}</TabPanel>
+                <TabPanel value="1">
+                    {
+                        <MyPosts
+                            email={userData.email}
+                            username={userData.username}
+                        />
+                    }
+                </TabPanel>
+                <TabPanel value="2">
+                    {<MyReviews email={userData.email} />}
+                </TabPanel>
                 <TabPanel value="3">
                     {userData.like ? (
                         <LikedPosts
