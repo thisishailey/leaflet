@@ -1,3 +1,4 @@
+// TODO make 'follow' feature
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -91,7 +92,7 @@ export default function Profile() {
                     <UserTabs
                         userData={{
                             email: userData.email,
-							username: userData.username,
+                            username: userData.username,
                             like: userData.like,
                             bookmark: userData.bookmark,
                         }}

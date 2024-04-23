@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { RegionSearchItem, RegionSearchResult } from '../api/bookstore/type';
 import { scrollToTop } from '@/util/common';
+
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CustomAlert from '@/components/common/alert';

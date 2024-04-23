@@ -68,8 +68,7 @@ export default function EditProfile({
             helper = '아이디는 4자 이상 16자 이하입니다.';
             error = true;
         } else if (!RegExp(usernamePattern).test(value)) {
-            helper =
-                '아이디는 영문 대소문자와 숫자, 밑줄(_)만 입력 가능합니다.';
+            helper = '아이디는 영문, 숫자, 밑줄(_)만 입력 가능합니다.';
             error = true;
         } else {
             const isAvailable: boolean = await checkUsernameAvailability(value);

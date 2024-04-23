@@ -1,3 +1,4 @@
+// TODO need to refactor
 'use client';
 
 import { useState } from 'react';
@@ -204,7 +205,7 @@ export default function SignUp() {
             error = true;
         } else if (!RegExp(usernamePattern).test(value)) {
             helper =
-                '아이디는 영문 대소문자와 숫자, 밑줄(_)만 입력 가능합니다.';
+                '아이디는 영문, 숫자, 밑줄(_)만 입력 가능합니다.';
             error = true;
         } else {
             const isAvailable: boolean = await checkUsernameAvailability(value);
@@ -303,7 +304,7 @@ export default function SignUp() {
 
         let newData: UserDataUpdate = {},
             needUpdate: boolean = false;
-			
+
         if (image) {
             const { error, imageUrl } = await uploadFile(
                 PROFILE_IMAGE,
