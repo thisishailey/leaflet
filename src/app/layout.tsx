@@ -1,3 +1,5 @@
+// TODO improve SEO
+
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import AuthContextProvider from '@/firebase/auth/state';
@@ -6,6 +8,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { theme } from '@/styles/theme';
+
 import Wrapper from '@/components/common/wrapper';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
@@ -13,8 +16,8 @@ import Loading from '@/components/common/loading';
 import favicon from '@/assets/favicon/favicon.ico';
 
 export const metadata: Metadata = {
-    title: 'Leaflet',
-    description: 'A social media platform for book lovers',
+    title: '리플렛',
+    description: '책을 좋아하는 사람들을 위한 소셜 플랫폼',
 };
 
 export default function RootLayout({

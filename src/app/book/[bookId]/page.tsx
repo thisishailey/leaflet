@@ -1,3 +1,4 @@
+// TODO add loading skeleton
 'use client';
 
 import { useEffect, useState } from 'react';
