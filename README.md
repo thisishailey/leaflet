@@ -4,8 +4,8 @@
 
 A social media platform for book-lovers!
 
-> 🌐 [Website](https://leaflet-readership.vercel.app/) \
-> 📑 [Notion](https://www.notion.so/hailey-page/Project-Leaflet-0226331222634270955d9e59b94f8ca9)
+> 🌐 [Website](https://leaflet-readers.com/) \
+> 📑 [Notion](https://notion.so/hailey-page/Project-Leaflet-0226331222634270955d9e59b94f8ca9)
 
 ## Built With
 
@@ -21,18 +21,19 @@ A social media platform for book-lovers!
 -   API
     -   Aladin API (books)
     -   Naver API (places, map, geocode)
--   Backend & DB
+-   Backend
     -   Firebase Authentication
     -   Firebase Cloud Firestore
     -   Firebase Storage
     -   Vercel
+    -   Namecheap DNS & SSL
 -   Version Control
     -   Git
     -   Sourcetree
 -   Plan & Design
     -   Figma
     -   Notion
--   Other
+-   Others
     -   VS Code
     -   Tiptap (WYSIWYG editor)
     -   uuid (UUID generator)
