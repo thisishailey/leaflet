@@ -21,8 +21,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MapIcon from '@mui/icons-material/Map';
 
-type BookPlaceTypes = '도서관' | '서점' | '북카페';
-const places: BookPlaceTypes[] = ['도서관', '서점', '북카페'];
+type BookPlaceTypes = '도서관' | '서점' | '독립서점';
+const places: BookPlaceTypes[] = ['도서관', '서점', '독립서점'];
 
 export default function Bookstore() {
     const [alert, setAlert] = useState<string>('');
