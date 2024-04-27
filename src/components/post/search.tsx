@@ -24,7 +24,7 @@ export default function SearchPost({ handleSearch }: Props) {
     const [isError, setIsError] = useState<boolean>(false);
     const [isMax, setIsMax] = useState<boolean>(false);
 
-    const placeholderText = '읽고 싶은 키워드를 검색해 보세요.';
+    const placeholderText = '키워드로 리프를 검색해 보세요.';
     const errorHelperText = '검색할 키워드를 1개 이상 입력해 주세요.';
     const maxHelperText = '최대 3개까지 입력할 수 있어요.';
 

@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { type Post, getPosts } from '@/firebase/db/query';
+import { useRecoilState } from 'recoil';
+import { postState } from '@/state/postState';
+
 import { PostPreview } from './post';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
@@ -13,7 +16,7 @@ interface Props {
 }
 
 export default function ViewPost({ search, refresh }: Props) {
-    const [postsAll, setPostsAll] = useState<Post[]>([]);
+    const [postsAll, setPostsAll] = useRecoilState(postState);
     const [posts, setPosts] = useState<Post[]>([]);
     const [noPost, setNoPost] = useState<boolean>(false);
     const [noSearchResult, setNoSearchResult] = useState<boolean>(false);
@@ -23,25 +26,34 @@ export default function ViewPost({ search, refresh }: Props) {
     const noSearchResultText = '검색 결과가 없습니다.';
 
     useEffect(() => {
-        const loadPost = async () => {
-            setLoading(true);
+        setLoading(true);
 
-            const posts = await getPosts();
+        if (postsAll === null) {
+            setNoPost(true);
+        } else if (postsAll.length > 0) {
+            setPosts(postsAll);
+        } else {
+            (async () => {
+                const posts = await getPosts();
 
-            if (posts.isEmpty) {
-                setLoading(false);
-                return setNoPost(true);
-            }
+                if (posts.isEmpty) {
+                    setPostsAll(null);
+                    setNoPost(true);
+                } else {
+                    setPostsAll(posts.result);
+                    setPosts(posts.result);
+                }
+            })();
+        }
 
-            setPostsAll(posts.result);
-            setPosts(posts.result);
-            setLoading(false);
-        };
-
-        loadPost();
-    }, [refresh]);
+        setLoading(false);
+    }, [postsAll, refresh, setPostsAll]);
 
     useEffect(() => {
+        if (postsAll === null || postsAll.length === 0) {
+            return;
+        }
+
         if (search.length === 0) {
             return setPosts(postsAll);
         }
