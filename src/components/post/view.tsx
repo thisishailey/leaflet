@@ -30,8 +30,10 @@ export default function ViewPost({ search, refresh }: Props) {
 
         if (postsAll === null) {
             setNoPost(true);
+            return setLoading(false);
         } else if (postsAll.length > 0) {
             setPosts(postsAll);
+            return setLoading(false);
         } else {
             (async () => {
                 const posts = await getPosts();
@@ -39,14 +41,14 @@ export default function ViewPost({ search, refresh }: Props) {
                 if (posts.isEmpty) {
                     setPostsAll(null);
                     setNoPost(true);
+                    return setLoading(false);
                 } else {
                     setPostsAll(posts.result);
                     setPosts(posts.result);
+                    return setLoading(false);
                 }
             })();
         }
-
-        setLoading(false);
     }, [postsAll, refresh, setPostsAll]);
 
     useEffect(() => {
