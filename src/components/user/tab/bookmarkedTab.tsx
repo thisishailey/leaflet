@@ -33,7 +33,7 @@ export default function BookmarkedPosts({ email, bookmarkedPosts }: Props) {
             setLoading(true);
             const posts: PostPreview[] = [];
 
-            for (let i = 0; i < bookmarkedPosts.length; i++) {
+            for (let i = bookmarkedPosts.length - 1; i >= 0; i--) {
                 const result = await getPostPreview(bookmarkedPosts[i]);
 
                 if (result.data) {

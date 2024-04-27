@@ -33,7 +33,7 @@ export default function LikedPosts({ email, likedPosts }: Props) {
             setLoading(true);
             const posts: PostPreview[] = [];
 
-            for (let i = 0; i < likedPosts.length; i++) {
+            for (let i = likedPosts.length - 1; i >= 0; i--) {
                 const result = await getPostPreview(likedPosts[i]);
 
                 if (result.data) {
