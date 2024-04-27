@@ -49,7 +49,23 @@ export default function ViewPost({ search, refresh }: Props) {
                 }
             })();
         }
-    }, [postsAll, refresh, setPostsAll]);
+    }, [postsAll, setPostsAll]);
+
+    useEffect(() => {
+        (async () => {
+            const posts = await getPosts();
+
+            if (posts.isEmpty) {
+                setPostsAll(null);
+                setNoPost(true);
+                return setLoading(false);
+            } else {
+                setPostsAll(posts.result);
+                setPosts(posts.result);
+                return setLoading(false);
+            }
+        })();
+    }, [refresh, setPostsAll]);
 
     useEffect(() => {
         if (postsAll === null || postsAll.length === 0) {
