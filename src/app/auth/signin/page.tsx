@@ -80,7 +80,7 @@ export default function SignIn() {
         if (toBack) {
             back();
         } else {
-            replace('/user/following');
+            replace('/user');
         }
     };
 
